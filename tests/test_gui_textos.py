@@ -68,6 +68,13 @@ def test_ningun_modulo_de_la_gui_pasa_de_100_lineas():
     assert largos == {}
 
 
+def test_los_archivos_de_prueba_de_la_gui_tampoco_pasan_de_100_lineas():
+    carpeta = os.path.dirname(__file__)
+    largos = {os.path.basename(f): n for f in glob.glob(os.path.join(carpeta, 'test_gui*.py'))
+              if (n := len(open(f, encoding='utf-8').read().splitlines())) > 100}
+    assert largos == {}
+
+
 def test_la_gui_solo_usa_la_api_publica():
     for ruta in _fuentes():
         for linea in open(ruta, encoding='utf-8'):

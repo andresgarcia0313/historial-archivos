@@ -27,7 +27,6 @@ EN = {
     'aceptar': 'OK',
     'cancelar': 'Cancel',
     'guardar': 'Save changes',
-    'cerrar': 'Close',
     'agregar': 'Add',
     'quitar': 'Remove',
     'unidad_titulo': 'Select a File History drive',

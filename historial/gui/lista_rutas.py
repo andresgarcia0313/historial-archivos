@@ -7,8 +7,9 @@ from .widgets import etiqueta
 
 
 class ListaRutas(W.QWidget):
-    def __init__(self, titulo: str, texto_agregar: str, rutas: list[str], vacia: str = '', padre=None):
+    def __init__(self, titulo: str, texto_agregar: str, rutas: list[str], vacia: str = '', pedir: str = 'elegir_carpeta', padre=None):
         super().__init__(padre)
+        self.pedir = pedir
         self.lista = W.QListWidget()
         self.lista.setSelectionMode(W.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.vacia = etiqueta(vacia, 'gris')
@@ -36,7 +37,7 @@ class ListaRutas(W.QWidget):
         self.vacia.setVisible(self.lista.count() == 0 and bool(self.vacia.text()))
 
     def elegir(self):
-        ruta = W.QFileDialog.getExistingDirectory(self, t('elegir_carpeta'), os.path.expanduser('~'))
+        ruta = W.QFileDialog.getExistingDirectory(self, t(self.pedir), os.path.expanduser('~'))
         if ruta:
             self.poner(ruta)
 

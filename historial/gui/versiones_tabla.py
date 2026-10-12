@@ -1,12 +1,12 @@
 """Piezas de Versiones anteriores: cabecera de la pestaña y tabla de versiones."""
 import os
 
-from .formato import fecha_texto, tam_humano
+from .formato import fecha_texto
 from .qt import W
 from .textos import t
 from .widgets import etiqueta, icono
 
-COLUMNAS = ('col_nombre', 'col_fecha', 'col_tam', 'col_ubicacion')
+COLUMNAS = ('col_nombre', 'col_fecha', 'col_ubicacion')
 
 
 def cabecera_pestana(texto: str) -> W.QWidget:
@@ -22,7 +22,7 @@ def cabecera_pestana(texto: str) -> W.QWidget:
 
 
 def crear_tabla(versiones) -> W.QTableWidget:
-    """Tabla de solo lectura con una fila por versión y la primera seleccionada."""
+    """Tabla de solo lectura (Nombre, Fecha de modificación, Ubicación) con la primera fila seleccionada."""
     tabla = W.QTableWidget(len(versiones), len(COLUMNAS))
     tabla.setHorizontalHeaderLabels([t(c) for c in COLUMNAS])
     tabla.verticalHeader().setVisible(False)
@@ -31,8 +31,7 @@ def crear_tabla(versiones) -> W.QTableWidget:
     tabla.setSelectionMode(W.QAbstractItemView.SelectionMode.SingleSelection)
     tabla.setEditTriggers(W.QAbstractItemView.EditTrigger.NoEditTriggers)
     for fila, v in enumerate(versiones):
-        datos = (os.path.basename(v.ruta), fecha_texto(v.fecha), tam_humano(v.tam), t('ubicacion_hist'))
-        for col, texto in enumerate(datos):
+        for col, texto in enumerate((os.path.basename(v.ruta), fecha_texto(v.fecha), t('ubicacion_hist'))):
             tabla.setItem(fila, col, W.QTableWidgetItem(texto))
     tabla.resizeColumnsToContents()
     if versiones:

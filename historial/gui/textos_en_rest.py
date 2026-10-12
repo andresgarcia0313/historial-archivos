@@ -1,6 +1,5 @@
 """English texts for restore, conflict and previous versions (as in Windows 11)."""
 EN_REST = {
-    'restaurar_titulo': 'Home - File History',
     'inicio': 'Home',
     'buscar': 'Search All',
     'atras': 'Back',

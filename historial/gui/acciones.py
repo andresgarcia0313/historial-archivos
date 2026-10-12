@@ -12,10 +12,11 @@ from .textos import t
 from .trabajo import lanzar
 
 
-def restaurar_entradas(ventana, cfg, entradas, destino_dir, al_terminar, punto_id=None) -> None:
+def restaurar_entradas(ventana, cfg, entradas, destino_dir, al_terminar, punto_id=None, conflicto='preguntar') -> None:
     """Restaura en un hilo. `al_terminar(rutas, error)`: error es '' si todo salió bien.
 
     `punto_id` fija la copia de la que se restauran las carpetas (None = la más reciente).
+    `conflicto` es 'preguntar' (diálogo por archivo), 'reemplazar', 'omitir' o 'renombrar'.
     La ventana debe tener el atributo `ocupado`: mientras es True no admite otra restauración ni se cierra.
     """
     decisor = Decisor(ventana)
@@ -27,7 +28,7 @@ def restaurar_entradas(ventana, cfg, entradas, destino_dir, al_terminar, punto_i
 
     extra = {} if punto_id is None else {'punto_id': punto_id}
     ventana.tarea = lanzar(
-        ventana, lambda: api.restaurar(cfg, entradas, destino_dir, 'preguntar', decisor, **extra),
+        ventana, lambda: api.restaurar(cfg, entradas, destino_dir, conflicto, decisor, **extra),
         lambda rutas: termina(list(rutas), ''), lambda motivo: termina([], motivo))
 
 

@@ -14,7 +14,7 @@ class Excluir(W.QDialog):
         self.cfg = cfg
         self.setWindowTitle(t('excluir_titulo'))
         self.resize(640, 600)
-        self.excluidas = ListaRutas(t('excluir_lista'), t('agregar'), cfg.excluir, t('excluir_vacia'))
+        self.excluidas = ListaRutas(t('excluir_lista'), t('agregar'), cfg.excluir, t('excluir_vacia'), 'excluir_elegir')
         self.incluidas = ListaRutas(t('incluir_lista'), t('incluir_agregar'), cfg.carpetas)
         total = W.QVBoxLayout(self)
         margenes(total, 24, 12)

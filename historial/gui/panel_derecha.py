@@ -40,7 +40,7 @@ class Derecha(W.QWidget):
         cuadro.addWidget(self.problema, 2, 0, 1, 2)
         cuadro.addWidget(self.ultima, 3, 0, 1, 2)
         self.activar = W.QPushButton(t('activar'))
-        self.ejecutar = W.QPushButton(t('ejecutar'))
+        self.ejecutar = enlace(t('ejecutar'))
         self.progreso = W.QProgressBar()
         self.progreso.setRange(0, 0)
         self.progreso.setTextVisible(False)

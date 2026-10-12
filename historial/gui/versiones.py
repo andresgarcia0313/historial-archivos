@@ -6,10 +6,12 @@ from historial.api import Entrada
 
 from . import acciones
 from .estilo import margenes
+from .formato import fecha_texto
 from .qt import W
+from .restaurar import Restaurar
 from .textos import t
 from .versiones_tabla import cabecera_pestana, crear_tabla
-from .widgets import botones_dialogo, etiqueta
+from .widgets import botones_dialogo, confirmar, etiqueta
 
 
 class Versiones(W.QDialog):
@@ -38,7 +40,10 @@ class Versiones(W.QDialog):
 
     def _botones(self) -> W.QHBoxLayout:
         self.abrir = W.QPushButton(t('abrir'))
-        self.abrir.clicked.connect(self.abrir_version)
+        apertura = W.QMenu(self)
+        apertura.addAction(t('abrir')).triggered.connect(lambda *_: self.abrir_version())
+        apertura.addAction(t('abrir_historial')).triggered.connect(lambda *_: self.abrir_historial())
+        self.abrir.setMenu(apertura)
         menu = W.QMenu(self)
         menu.addAction(t('restaurar')).triggered.connect(lambda *_: self.restaurar())
         menu.addAction(t('restaurar_en')).triggered.connect(lambda *_: self.restaurar_en())
@@ -59,12 +64,23 @@ class Versiones(W.QDialog):
         if v:
             acciones.abrir_copia(v.archivo, os.path.basename(v.ruta))
 
+    def abrir_historial(self):
+        self.ventana_historial = Restaurar(os.path.dirname(self.ruta), self.cfg)
+        self.ventana_historial.show()
+
     def restaurar(self, destino=None):
+        """Sin destino: confirma y reemplaza el archivo actual (que el motor versiona antes)."""
         v = self.seleccionada()
-        if v and not self.ocupado:
-            entrada = Entrada(os.path.basename(v.ruta), v.ruta, False, v.tam, v.fecha, v.id)
-            self.estado.setText(t('restaurando'))
-            acciones.restaurar_entradas(self, self.cfg, [entrada], destino, self._restaurado)
+        if not v or self.ocupado:
+            return
+        if destino is None:
+            pregunta = t('versiones_confirma', nombre=os.path.basename(v.ruta), fecha=fecha_texto(v.fecha))
+            if not confirmar(self, f"{pregunta}\n\n{t('versiones_reemplaza')}"):
+                return
+        entrada = Entrada(os.path.basename(v.ruta), v.ruta, False, v.tam, v.fecha, v.id)
+        self.estado.setText(t('restaurando'))
+        modo = 'reemplazar' if destino is None else 'preguntar'
+        acciones.restaurar_entradas(self, self.cfg, [entrada], destino, self._restaurado, conflicto=modo)
 
     def restaurar_en(self):
         destino = acciones.elegir_destino(self)
@@ -72,7 +88,7 @@ class Versiones(W.QDialog):
             self.restaurar(destino)
 
     def _restaurado(self, rutas, error):
-        self.estado.setText(t('restaurar_fallo', motivo=error) if error else t('restaurado', n=len(rutas)))
+        self.estado.setText(t('restaurar_fallo', motivo=error) if error else t('versiones_ok'))
 
     def reject(self):
         if not self.ocupado:

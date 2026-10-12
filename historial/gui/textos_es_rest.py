@@ -1,6 +1,5 @@
 """Textos en español (es-CO) de restaurar, conflicto y versiones anteriores (los de Windows 11)."""
 ES_REST = {
-    'restaurar_titulo': 'Página principal - Historial de archivos',
     'inicio': 'Página principal',
     'buscar': 'Buscar Todo',
     'atras': 'Atrás',

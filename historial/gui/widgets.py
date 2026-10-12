@@ -1,5 +1,6 @@
 """Piezas pequeñas compartidas por las ventanas."""
 from .qt import G, Qt, W
+from .textos import t
 
 
 def etiqueta(texto: str = '', nombre: str | None = None) -> W.QLabel:
@@ -45,3 +46,13 @@ def botones_dialogo(dialogo, texto_ok: str, texto_cancelar: str | None) -> W.QDi
 def aviso(padre, texto: str) -> None:
     """Mensaje informativo modal."""
     W.QMessageBox.information(padre, '', texto)
+
+
+def confirmar(padre, texto: str) -> bool:
+    """Pregunta modal con Aceptar y Cancelar (textos propios, sin depender de las traducciones de Qt)."""
+    caja = W.QMessageBox(padre)
+    caja.setText(texto)
+    aceptar = caja.addButton(t('aceptar'), W.QMessageBox.ButtonRole.AcceptRole)
+    caja.addButton(t('cancelar'), W.QMessageBox.ButtonRole.RejectRole)
+    caja.exec()
+    return caja.clickedButton() is aceptar

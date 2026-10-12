@@ -1,4 +1,6 @@
 """Restaurar archivos personales: navegación por carpetas y por la línea de tiempo de copias."""
+import os
+
 from historial import api
 
 from . import acciones
@@ -13,11 +15,7 @@ class Restaurar(W.QMainWindow):
     def __init__(self, carpeta: str = '', cfg=None):
         super().__init__()
         self.cfg = cfg or api.cargar_config()
-        self.puntos = api.puntos(self.cfg)
-        self.i = len(self.puntos) - 1
-        self.nav = Navegacion(carpeta)
-        self.ocupado = False
-        self.setWindowTitle(t('restaurar_titulo'))
+        self.nav, self.ocupado = Navegacion(carpeta), False
         self.resize(980, 640)
         c = self.c = Cuerpo()
         self.setCentralWidget(c)
@@ -26,12 +24,18 @@ class Restaurar(W.QMainWindow):
         c.barra.anterior.connect(lambda: self.mover(-1))
         c.barra.siguiente.connect(lambda: self.mover(1))
         c.barra.restaurar.connect(lambda: self.restaurar(None))
-        c.atras.clicked.connect(lambda *_: self.navegar('atras'))
-        c.adelante.clicked.connect(lambda *_: self.navegar('adelante'))
-        c.arriba.clicked.connect(lambda *_: self.navegar('arriba'))
+        for boton, como in ((c.atras, 'atras'), (c.adelante, 'adelante'), (c.arriba, 'arriba')):
+            boton.clicked.connect(lambda *_, como=como: self.navegar(como))
         c.inicio.clicked.connect(lambda *_: self.ir(''))
+        c.actualizar.clicked.connect(lambda *_: self.actualizar())
         c.accion_en.triggered.connect(lambda *_: self.restaurar_en())
         c.accion_todo.triggered.connect(lambda *_: c.vista.selectAll())
+        self.actualizar()
+
+    def actualizar(self):
+        """Vuelve a leer las copias (F5) y se coloca en la más reciente."""
+        self.puntos = api.puntos(self.cfg)
+        self.i = len(self.puntos) - 1
         self.recargar()
 
     def recargar(self):
@@ -39,16 +43,16 @@ class Restaurar(W.QMainWindow):
         entradas = api.listar(self.cfg, self.puntos[self.i].id, self.nav.carpeta) if hay else []
         c.vista.cargar(entradas)
         c.ruta.setText(miga(self.nav.carpeta, self.cfg.carpetas))
+        self.setWindowTitle(f"{os.path.basename(self.nav.carpeta) or t('inicio')} - {t('titulo_ventana')}")
         c.barra.ajustar(self.i if hay else -1, len(self.puntos))
         c.atras.setEnabled(self.nav.hay_atras())
         c.adelante.setEnabled(self.nav.hay_adelante())
         c.arriba.setEnabled(bool(self.nav.carpeta))
+        c.engranaje.setEnabled(hay)
         fecha = fecha_texto(self.puntos[self.i].fecha, True) if hay else ''
         c.encabezado.setText(t('encabezado_punto', fecha=fecha, n=self.i + 1, m=len(self.puntos)) if hay else '')
-        c.estado.setText('' if entradas else t('carpeta_vacia' if hay else self._sin_copias()))
-
-    def _sin_copias(self) -> str:
-        return 'sin_copias' if self.cfg.activo else 'restaurar_desactivado'
+        vacio = 'carpeta_vacia' if hay else 'sin_copias' if self.cfg.activo else 'restaurar_desactivado'
+        c.estado.setText('' if entradas else t(vacio))
 
     def mover(self, paso: int):
         self.i = min(max(0, self.i + paso), len(self.puntos) - 1)

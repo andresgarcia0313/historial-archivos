@@ -28,7 +28,6 @@ ES = {
     'aceptar': 'Aceptar',
     'cancelar': 'Cancelar',
     'guardar': 'Guardar cambios',
-    'cerrar': 'Cerrar',
     'agregar': 'Agregar',
     'quitar': 'Quitar',
     'unidad_titulo': 'Seleccionar una unidad del Historial de archivos',
