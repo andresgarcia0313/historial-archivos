@@ -26,6 +26,7 @@ def test_config_ida_y_vuelta_y_tolerancia(entorno):
 
 
 def test_unidades_systemd_al_guardar_y_al_desactivar(entorno, monkeypatch):
+    monkeypatch.setattr(sys, 'platform', 'linux')
     def prohibido(*a, **k):
         raise AssertionError('no debe llamar a systemctl con HISTORIAL_SIN_PROGRAMAR=1')
 
@@ -46,6 +47,7 @@ def test_unidades_systemd_al_guardar_y_al_desactivar(entorno, monkeypatch):
 
 
 def test_systemd_llama_a_systemctl_en_orden(entorno, monkeypatch):
+    monkeypatch.setattr(sys, 'platform', 'linux')
     monkeypatch.delenv('HISTORIAL_SIN_PROGRAMAR')
     llamadas = []
     monkeypatch.setattr(subprocess, 'run', lambda orden, **k: llamadas.append(list(orden)))
