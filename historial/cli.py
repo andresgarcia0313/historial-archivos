@@ -6,7 +6,7 @@ import dataclasses
 import json
 import sys
 
-from . import __version__, api, prioridad
+from . import __version__, api, prioridad, registro
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -26,7 +26,16 @@ def _ejecutar(ahora: bool) -> int:
     if not cfg.activo and not ahora:
         return 0
     prioridad.bajar()
-    resumen = api.ejecutar(cfg)
+    try:
+        resumen = api.ejecutar(cfg)
+    except Exception as error:                      # el registro debe mostrar también los fallos graves
+        registro.anotar('ERROR', f'La copia falló: {error}')
+        raise
+    nivel = 'ADVERTENCIA' if resumen.errores else 'INFORMACIÓN'
+    registro.anotar(nivel, f'Copia {resumen.punto_id}: revisados {resumen.revisados}, '
+                           f'copiados {resumen.copiados} ({resumen.bytes_copiados} bytes), errores {len(resumen.errores)}')
+    for error in resumen.errores[:50]:
+        registro.anotar('ERROR', error)
     print(f'Revisados {resumen.revisados}, copiados {resumen.copiados}, errores {len(resumen.errores)}')
     for error in resumen.errores[:20]:
         print(error, file=sys.stderr)
