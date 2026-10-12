@@ -65,7 +65,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest -q
       - id: paquete
-        run: echo "dmg=$(scripts/empaquetar-dmg.sh | tail -1)" >> "$GITHUB_OUTPUT"
+        run: dmg="$(scripts/empaquetar-dmg.sh)"; dmg="${dmg##*$'\n'}"; echo "dmg=$dmg" >> "$GITHUB_OUTPUT"
       - name: Prueba de humo del dmg (sin pantalla)
         run: scripts/probar-dmg.sh "${{ steps.paquete.outputs.dmg }}"
       - uses: actions/upload-artifact@v4

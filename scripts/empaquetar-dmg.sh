@@ -17,7 +17,7 @@ rm -rf build dist/"$nombre.app" dist/historial-archivos
 python -I packaging/macos/crear_icns.py \
   packaging/linux/io.github.andresgarcia0313.HistorialArchivos.svg \
   packaging/macos/historial-archivos.icns
-python -m PyInstaller --noconfirm --windowed packaging/macos/historial-archivos.spec
+python -m PyInstaller --noconfirm packaging/macos/historial-archivos.spec
 
 # PyInstaller reescribe binarios; Apple Silicon se niega a ejecutarlos sin firma.
 codesign --force --deep --sign - "dist/$nombre.app"
