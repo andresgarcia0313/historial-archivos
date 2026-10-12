@@ -1,5 +1,5 @@
 """Vista de iconos grandes de "Restaurar archivos personales"."""
-from .qt import C, G, Qt, W
+from .qt import C, G, Qt, Signal, W
 
 _mime = C.QMimeDatabase()
 
@@ -14,7 +14,7 @@ def icono_de(entrada) -> G.QIcon:
 
 
 class Vista(W.QListView):
-    abrir = C.Signal(object) if hasattr(C, 'Signal') else C.pyqtSignal(object)
+    abrir = Signal(object)
 
     def __init__(self, padre=None):
         super().__init__(padre)
