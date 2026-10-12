@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import sqlite3
 import time
 from types import SimpleNamespace
 
@@ -33,3 +34,25 @@ def escribir(ruta, texto: str, mtime: float | None = None) -> str:
 
 def nombres_en(carpeta) -> list[str]:
     return sorted(p.name for p in carpeta.rglob('*') if p.is_file())
+
+
+def envenenar(entorno, sql, *args):
+    con = sqlite3.connect(entorno.home / '.local/share/historial-archivos/catalogo.sqlite')
+    con.execute(sql, args)
+    con.commit()
+    con.close()
+
+
+def con_dos_versiones(entorno):
+    ruta = escribir(entorno.origen / 'a.txt', 'primera')
+    api.ejecutar(entorno.cfg)
+    escribir(entorno.origen / 'a.txt', 'segunda mas larga')
+    api.ejecutar(entorno.cfg)
+    antigua = api.versiones(entorno.cfg, ruta)[1]
+    secreto = entorno.raiz / 'secreto.txt'
+    secreto.write_text('no tocar')
+    return ruta, antigua, secreto
+
+
+def entrada_de(ruta, version_id, nombre='a.txt'):
+    return api.Entrada(nombre, ruta, False, version_id=version_id)

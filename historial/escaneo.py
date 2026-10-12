@@ -15,6 +15,22 @@ def _coincide(nombre: str, patrones) -> bool:
     return any(fnmatch.fnmatchcase(nombre, patron) for patron in patrones)
 
 
+def cambio(ruta: str, info: os.stat_result, vigentes: dict) -> bool:
+    """Nuevo o con distinto tamaño o mtime_ns que su versión vigente."""
+    previa = vigentes.get(ruta)
+    return previa is None or previa[1:] != (info.st_size, info.st_mtime_ns)
+
+
+def desaparecidos(vigentes: dict, vistos: set, escaneadas: list, inseguros: list) -> list[int]:
+    """Versiones vigentes de archivos que ya no están, salvo bajo zonas ilegibles o montajes."""
+    raices = tuple(c.rstrip(os.sep) + os.sep for c in escaneadas)
+    veto = tuple(i.rstrip(os.sep) + os.sep for i in inseguros)
+    sueltos = set(inseguros)
+    return [v[0] for ruta, v in vigentes.items()
+            if ruta not in vistos and ruta.startswith(raices) and ruta not in sueltos
+            and not ruta.startswith(veto)]
+
+
 def recorrer(raiz: str, excluir: set[str], patrones, inseguros: list[str]):
     """Genera (ruta, stat) de cada archivo regular bajo `raiz`.
 

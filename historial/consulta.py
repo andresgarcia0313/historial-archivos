@@ -14,9 +14,17 @@ def _fecha(mtime_ns: int) -> datetime:
     return datetime.fromtimestamp(mtime_ns / 1e9)
 
 
-def a_version(cfg: Config, fila) -> Version:
-    archivo = os.path.join(destino.carpeta_datos(cfg), fila['archivo'])
-    return Version(fila['id'], fila['ruta'], _fecha(fila['mtime_ns']), fila['tam'], archivo)
+def a_version(cfg: Config, fila) -> Version | None:
+    """None si la fila no es de fiar: ruta original no absoluta o con '..', o copia fuera de Datos."""
+    ruta = fila['ruta']
+    archivo = destino.copia_segura(cfg, fila['archivo'])
+    if archivo is None or not os.path.isabs(ruta) or not destino.sin_subidas(ruta):
+        return None
+    return Version(fila['id'], ruta, _fecha(fila['mtime_ns']), fila['tam'], archivo)
+
+
+def _validas(cfg: Config, filas) -> list[Version]:
+    return [v for v in (a_version(cfg, f) for f in filas) if v is not None]
 
 
 def puntos(cfg: Config) -> list[Punto]:
@@ -42,7 +50,7 @@ def en_punto(cfg: Config, cat, carpeta: str, punto: int) -> list[Version]:
     inicio, fin = _bajo(carpeta)
     filas = cat.db.execute(f'SELECT * FROM versiones WHERE ruta >= ? AND ruta < ? AND {_EN_PUNTO}',
                            (inicio, fin, punto, punto))
-    return [a_version(cfg, f) for f in filas]
+    return _validas(cfg, filas)
 
 
 def listar(cfg: Config, punto_id: int, carpeta: str) -> list[Entrada]:
@@ -69,7 +77,7 @@ def versiones(cfg: Config, ruta: str) -> list[Version]:
     if cat is None:
         return []
     filas = cat.db.execute('SELECT * FROM versiones WHERE ruta=? ORDER BY id DESC', (ruta,))
-    return [a_version(cfg, f) for f in filas]
+    return _validas(cfg, filas)
 
 
 def version_de(cfg: Config, cat, entrada: Entrada) -> Version | None:

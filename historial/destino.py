@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import getpass
+import logging
 import os
 import socket
 import time
 
 from .api import Config
+
+registro = logging.getLogger('historial')
 
 
 def _usuario() -> str:
@@ -30,6 +33,28 @@ def carpeta_datos(cfg: Config) -> str:
 
 def catalogo_remoto(cfg: Config) -> str:
     return os.path.join(raiz_equipo(cfg), 'Configuracion', 'catalogo.sqlite')
+
+
+def sin_subidas(ruta: str) -> bool:
+    """True si la ruta no trae NUL ni componentes '..' (el catálogo puede venir de un destino ajeno)."""
+    return '\0' not in ruta and '..' not in ruta.replace('\\', '/').split('/')
+
+
+def dentro(base: str, ruta: str) -> bool:
+    """True si `ruta`, resueltos los enlaces simbólicos, queda dentro de `base`."""
+    base, real = os.path.realpath(base), os.path.realpath(ruta)
+    return real == base or real.startswith(base.rstrip(os.sep) + os.sep)
+
+
+def copia_segura(cfg: Config, relativa: str) -> str | None:
+    """Ruta absoluta de una copia si queda dentro de Datos; si no, la registra y devuelve None."""
+    datos = carpeta_datos(cfg)
+    if relativa and not os.path.isabs(relativa) and sin_subidas(relativa):
+        ruta = os.path.join(datos, relativa)
+        if dentro(datos, ruta):
+            return ruta
+    registro.warning('Copia ignorada, queda fuera de Datos: %r', relativa)
+    return None
 
 
 def sello_utc(marca: float) -> str:

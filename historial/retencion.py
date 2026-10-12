@@ -27,9 +27,12 @@ def _borrar(cfg: Config, cat, filas) -> tuple[int, int]:
     datos = destino.carpeta_datos(cfg)
     liberado, ids = 0, []
     for fila in filas:
-        ruta = os.path.join(datos, fila['archivo'])
+        ruta = destino.copia_segura(cfg, fila['archivo'])
+        if ruta is None:                      # fila ajena o manipulada: se descarta sin tocar el disco
+            ids.append((fila['id'],))
+            continue
         try:
-            os.unlink(ruta)
+            os.unlink(ruta)                   # unlink no sigue el enlace final
         except FileNotFoundError:
             pass
         except OSError:
