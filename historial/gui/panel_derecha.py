@@ -46,7 +46,7 @@ class Derecha(W.QWidget):
         total.addStretch(1)
         total.setAlignment(self.progreso, Qt.AlignmentFlag.AlignTop)
 
-    def mostrar(self, cfg, est) -> None:
+    def mostrar(self, cfg, est, copiando: bool = False) -> None:
         """Pinta la configuración y el estado actuales del motor."""
         self.estado.setText(t('activado' if est.activo else 'desactivado'))
         self.estado.setObjectName('estado_on' if est.activo else 'estado_off')
@@ -61,6 +61,6 @@ class Derecha(W.QWidget):
         self.ultima.setText(t('ultima_copia', fecha=fecha_texto(est.ultima_copia))
                             if est.ultima_copia else t('nunca'))
         self.activar.setText(t('desactivar' if est.activo else 'activar'))
-        self.ejecutar.setEnabled(est.activo and est.destino_conectado and not est.en_curso)
-        self.progreso.setVisible(est.en_curso)
-        self.avance.setText(t('copiando') if est.en_curso else '')
+        self.ejecutar.setEnabled(est.activo and est.destino_conectado and not copiando)
+        self.progreso.setVisible(copiando)
+        self.avance.setText(t('copiando') if copiando else '')

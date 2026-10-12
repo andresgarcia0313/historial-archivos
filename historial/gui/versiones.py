@@ -7,7 +7,7 @@ from historial.api import Entrada
 from . import acciones
 from .estilo import margenes
 from .formato import fecha_texto, tam_humano
-from .qt import Qt, W
+from .qt import W
 from .textos import t
 from .widgets import etiqueta
 
@@ -30,8 +30,8 @@ class Versiones(W.QDialog):
         self.tabla.setSelectionBehavior(W.QAbstractItemView.SelectionBehavior.SelectRows)
         self.tabla.setSelectionMode(W.QAbstractItemView.SelectionMode.SingleSelection)
         self.tabla.setEditTriggers(W.QAbstractItemView.EditTrigger.NoEditTriggers)
-        self._llenar()
         self.estado = etiqueta('', 'gris')
+        self._llenar()
         total = W.QVBoxLayout(self)
         margenes(total, 20, 10)
         total.addWidget(etiqueta(t('versiones_lista')))
@@ -47,7 +47,7 @@ class Versiones(W.QDialog):
         if self.lista_versiones:
             self.tabla.selectRow(0)
         else:
-            self.estado.setText(t('versiones_vacia')) if hasattr(self, 'estado') else None
+            self.estado.setText(t('versiones_vacia'))
 
     def _botones(self) -> W.QHBoxLayout:
         self.abrir = W.QPushButton(t('abrir'))

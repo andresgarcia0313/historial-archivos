@@ -46,27 +46,25 @@ class Panel(W.QMainWindow):
 
     def refrescar(self):
         self.cfg = api.cargar_config()
-        est = api.estado(self.cfg)
-        self.derecha.mostrar(self.cfg, est)
-        if est.en_curso:
+        self.est = api.estado(self.cfg)
+        if self.est.en_curso:
             self.espera = 0
-        if (est.en_curso or self.espera > 0) and not self.sondeo.isActive():
+        self.derecha.mostrar(self.cfg, self.est, copiando=self.est.en_curso or self.espera > 0)
+        if self.est.en_curso or self.espera > 0:
             self.sondeo.start()
 
     def sondear(self):
         """Mientras copia (aunque lo haya lanzado el temporizador) consulta el estado cada segundo."""
-        self.espera -= 1
+        self.espera = max(0, self.espera - 1)
         self.refrescar()
-        if not api.estado(self.cfg).en_curso and self.espera <= 0:
+        if not self.est.en_curso and self.espera == 0:
             self.sondeo.stop()
 
     def ejecutar(self):
+        """Lanza la copia en otro proceso (no bloquea) y vigila hasta que el estado diga que terminó."""
         api.ejecutar_en_segundo_plano()
         self.espera = 3
-        self.derecha.ejecutar.setEnabled(False)
-        self.derecha.progreso.setVisible(True)
-        self.derecha.avance.setText(t('copiando'))
-        self.sondeo.start()
+        self.refrescar()
 
     def alternar(self):
         if self.cfg.activo:
