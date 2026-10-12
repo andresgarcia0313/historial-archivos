@@ -5,11 +5,11 @@ from . import carpetas_base
 from .avanzada import Avanzada
 from .excluir import Excluir
 from .panel_derecha import Derecha
+from .panel_lateral import Lateral
 from .qt import C, Qt, W
 from .restaurar import Restaurar
 from .textos import t
 from .unidad import Unidad
-from .widgets import enlace
 
 
 class Panel(W.QMainWindow):
@@ -25,15 +25,8 @@ class Panel(W.QMainWindow):
         self.derecha = Derecha()
         self.derecha.activar.clicked.connect(self.alternar)
         self.derecha.ejecutar.clicked.connect(self.ejecutar)
-        lateral = W.QWidget()
-        lateral.setObjectName('lateral')
-        lateral.setFixedWidth(240)
-        columna = W.QVBoxLayout(lateral)
-        columna.setContentsMargins(24, 28, 12, 12)
-        for clave, accion in (('enl_restaurar', self.abrir_restaurar), ('enl_unidad', self.elegir_unidad),
-                              ('enl_excluir', self.excluir), ('enl_avanzada', self.avanzada)):
-            columna.addWidget(enlace(t(clave), accion))
-        columna.addStretch(1)
+        lateral = Lateral((('enl_restaurar', self.abrir_restaurar), ('enl_unidad', self.elegir_unidad),
+                           ('enl_excluir', self.excluir), ('enl_avanzada', self.avanzada)))
         centro = W.QWidget()
         centro.setObjectName('contenido')
         fila = W.QHBoxLayout(centro)
