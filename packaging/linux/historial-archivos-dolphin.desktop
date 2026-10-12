@@ -1,5 +1,7 @@
 [Desktop Entry]
 Type=Service
+Name=File History
+Name[es]=Historial de archivos
 MimeType=all/all;
 X-KDE-Priority=TopLevel
 Actions=versiones;restaurar;
