@@ -74,17 +74,59 @@ class Resumen:
     errores: list[str] = field(default_factory=list)
 
 
-def cargar_config() -> Config: ...                                  # ~/.config/historial-archivos/config.json
-def guardar_config(cfg: Config) -> None: ...                        # y llama a programador.aplicar(cfg)
-def ejecutar(cfg: Config, progreso=None) -> Resumen: ...            # progreso(texto, fraccion 0..1)
-def estado(cfg: Config) -> Estado: ...
-def puntos(cfg: Config) -> list[Punto]: ...                         # del más antiguo al más reciente
-def listar(cfg: Config, punto_id: int, carpeta: str) -> list[Entrada]: ...  # carpeta='' = raíz (las carpetas protegidas)
-def versiones(cfg: Config, ruta: str) -> list[Version]: ...         # versiones distintas, la más reciente primero
+# Implementación: cada función delega en su módulo (importación perezosa, evita ciclos con este contrato).
+def cargar_config() -> Config:                                      # ~/.config/historial-archivos/config.json
+    from . import config
+    return config.cargar()
+
+
+def guardar_config(cfg: Config) -> None:                            # y llama a programador.aplicar(cfg)
+    from . import config
+    config.guardar(cfg)
+
+
+def ejecutar(cfg: Config, progreso=None) -> Resumen:                # progreso(texto, fraccion 0..1)
+    from . import copia
+    return copia.ejecutar(cfg, progreso)
+
+
+def estado(cfg: Config) -> Estado:
+    from . import estado as modulo
+    return modulo.estado(cfg)
+
+
+def puntos(cfg: Config) -> list[Punto]:                             # del más antiguo al más reciente
+    from . import consulta
+    return consulta.puntos(cfg)
+
+
+def listar(cfg: Config, punto_id: int, carpeta: str) -> list[Entrada]:  # carpeta='' = raíz (carpetas protegidas)
+    from . import consulta
+    return consulta.listar(cfg, punto_id, carpeta)
+
+
+def versiones(cfg: Config, ruta: str) -> list[Version]:             # versiones distintas, la más reciente primero
+    from . import consulta
+    return consulta.versiones(cfg, ruta)
+
+
 def restaurar(cfg: Config, entradas: list[Entrada], destino_dir: str | None = None,
-              conflicto: str = 'preguntar', decidir=None) -> list[str]: ...
+              conflicto: str = 'preguntar', decidir=None, punto_id: int | None = None) -> list[str]:
     # destino_dir None = ubicación original. conflicto: 'reemplazar' | 'omitir' | 'renombrar' | 'preguntar'
-    # (con 'preguntar', decidir(ruta_existente, version) devuelve uno de los otros tres). Carpetas: recursivo.
+    # (con 'preguntar', decidir(ruta_existente, version) devuelve uno de los otros tres; sin decidir = renombrar).
+    # Carpetas: recursivo, con el contenido que tenían en punto_id (None = el punto más reciente).
     # Devuelve las rutas escritas. Al reemplazar, el archivo actual se versiona antes si cambió.
-def limpiar(cfg: Config, anteriores_a_dias: int | None) -> int: ... # None = todas menos la más reciente; bytes liberados
-def ejecutar_en_segundo_plano() -> None: ...                        # lanza la copia sin bloquear la GUI ("Ejecutar ahora")
+    from . import restaurar as modulo
+    return modulo.restaurar(cfg, entradas, destino_dir, conflicto, decidir, punto_id)
+
+
+def limpiar(cfg: Config, anteriores_a_dias: int | None) -> int:     # None = todas menos la más reciente; bytes liberados
+    from . import retencion
+    return retencion.limpiar(cfg, anteriores_a_dias)
+
+
+def ejecutar_en_segundo_plano() -> None:                            # lanza la copia sin bloquear la GUI ("Ejecutar ahora")
+    import subprocess
+    from . import programador
+    subprocess.Popen(programador.comando() + ['--ahora'], start_new_session=True, close_fds=True,
+                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
