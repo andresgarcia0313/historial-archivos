@@ -27,3 +27,9 @@ def test_registro_se_recorta(tmp_path, monkeypatch):
     import os
     assert os.path.getsize(registro.ruta()) < 1200
     assert 'linea 199' in open(registro.ruta(), encoding='utf-8').read()
+
+
+def test_nombre_con_salto_de_linea_no_inyecta(tmp_path, monkeypatch):
+    monkeypatch.setenv('XDG_DATA_HOME', str(tmp_path))
+    registro.anotar('ERROR', 'malo\n2026-01-01 00:00:00 INFORMACIÓN falso')
+    assert len(open(registro.ruta(), encoding='utf-8').read().splitlines()) == 1

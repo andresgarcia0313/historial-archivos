@@ -13,6 +13,7 @@ def ruta() -> str:
 
 
 def anotar(nivel: str, texto: str) -> None:
+    texto = texto.encode('unicode_escape').decode('ascii') if any(c in texto for c in '\r\n\x1b') else texto
     archivo = ruta()
     os.makedirs(os.path.dirname(archivo), exist_ok=True)
     try:
