@@ -12,6 +12,7 @@ version="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' "$raiz/historial/__init__.py"
 salida="$raiz/dist"
 paquete="$(mktemp -d)"
 trap 'rm -rf -- "$paquete"' EXIT
+chmod 755 "$paquete"
 destino="$paquete/usr/lib/python3/dist-packages"
 
 install -d "$destino"

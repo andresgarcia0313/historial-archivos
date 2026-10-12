@@ -27,7 +27,9 @@ probar_aqui() {
   grep -q 'historial-archivos --versiones %f' /usr/share/kio/servicemenus/historial-archivos.desktop
 
   export HOME=/tmp/casa HISTORIAL_SIN_PROGRAMAR=1 QT_QPA_PLATFORM=offscreen
-  mkdir -p "$HOME"
+  export XDG_RUNTIME_DIR=/tmp/ejecucion
+  mkdir -p "$HOME" "$XDG_RUNTIME_DIR"
+  chmod 700 "$XDG_RUNTIME_DIR"
   historial-archivos --estado | /usr/bin/python3 -c 'import json,sys; print("   --estado:", json.load(sys.stdin))'
   # La interfaz debe seguir viva tras 8 s (código 124 de timeout) y sin errores de Python o Qt.
   codigo=0
