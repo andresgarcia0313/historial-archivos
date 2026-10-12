@@ -1,8 +1,8 @@
-"""Etiquetas de las listas de frecuencia y de retención (iguales a las de Windows)."""
+"""Etiquetas de las listas de frecuencia, retención y limpieza (iguales a las de Windows)."""
 from .textos import t
 
 PRED_FRECUENCIA = 60
-PRED_CONSERVAR = 0
+PRED_LIMPIAR = 365
 
 
 def _meses(n: int) -> str:
@@ -33,5 +33,7 @@ def texto_conservar(dias: int) -> str:
 
 
 def texto_limpiar(dias) -> str:
-    """Opciones del diálogo Limpiar versiones; None = todas menos la más reciente."""
-    return t('limpiar_todos') if dias is None else texto_conservar(dias)
+    """Opciones de Limpieza: "Hace más de 1 año (predeterminado)"; None = todas menos la última."""
+    if dias is None:
+        return t('limpiar_todos')
+    return t('hace_mas', tiempo=texto_conservar(dias)) + (t('predeterminado') if dias == PRED_LIMPIAR else '')

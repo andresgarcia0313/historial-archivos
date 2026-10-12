@@ -29,6 +29,9 @@ def test_capturas_de_todas_las_pantallas(app, falso, monkeypatch, tmp_path):
         unidades.Unidad('Disco externo', '/media/usuario/Disco externo', 380 * 2**30, 465 * 2**30),
         unidades.Unidad('Respaldo', '/run/media/usuario/Respaldo', 1500 * 2**30, 1863 * 2**30)])
     falso.cfg.destino, falso.cfg.excluir = '/media/usuario/Disco externo', [falso.base + '/Documentos/Borradores']
+    destino, falso.cfg.destino = falso.cfg.destino, ''
+    _guardar(Panel(), 'panel-sin-unidad', salida)
+    falso.cfg.destino = destino
     p = Panel()
     _guardar(p, 'panel-desactivado', salida)
     falso.cfg.activo = True
@@ -56,4 +59,4 @@ def test_capturas_de_todas_las_pantallas(app, falso, monkeypatch, tmp_path):
         _guardar(Restaurar(falso.docs), 'restaurar-ingles', salida)
     finally:
         textos.fijar(None)
-    assert len([f for f in os.listdir(salida) if f.startswith('gui-')]) >= 13
+    assert len([f for f in os.listdir(salida) if f.startswith('gui-')]) >= 14

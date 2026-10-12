@@ -22,6 +22,8 @@ class Unidad(W.QDialog):
         self.lista.setHeaderLabels([t('col_unidades'), t('col_libre'), t('col_total')])
         self.lista.header().setStretchLastSection(False)
         self.lista.header().setSectionResizeMode(0, W.QHeaderView.ResizeMode.Stretch)
+        for columna in (1, 2):
+            self.lista.header().setSectionResizeMode(columna, W.QHeaderView.ResizeMode.ResizeToContents)
         self.vacia = etiqueta(t('unidad_ninguna'), 'gris')
         total = W.QVBoxLayout(self)
         margenes(total, 24, 12)
