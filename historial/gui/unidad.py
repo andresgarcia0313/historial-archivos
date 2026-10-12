@@ -8,7 +8,7 @@ from .estilo import margenes
 from .formato import tam_humano
 from .qt import Qt, W
 from .textos import t
-from .widgets import botones_dialogo, etiqueta
+from .widgets import botones_dialogo, enlace, etiqueta
 
 
 class Unidad(W.QDialog):
@@ -16,47 +16,50 @@ class Unidad(W.QDialog):
         super().__init__(padre)
         self.cfg = cfg
         self.setWindowTitle(t('unidad_titulo'))
-        self.resize(620, 420)
-        self.lista = W.QListWidget()
+        self.resize(640, 460)
+        self.lista = W.QTreeWidget()
+        self.lista.setRootIsDecorated(False)
+        self.lista.setHeaderLabels([t('col_unidades'), t('col_libre'), t('col_total')])
+        self.lista.header().setStretchLastSection(False)
+        self.lista.header().setSectionResizeMode(0, W.QHeaderView.ResizeMode.Stretch)
         self.vacia = etiqueta(t('unidad_ninguna'), 'gris')
-        red = W.QPushButton(t('unidad_red'))
-        red.clicked.connect(self.agregar_red)
         total = W.QVBoxLayout(self)
-        margenes(total, 24, 14)
+        margenes(total, 24, 12)
         total.addWidget(etiqueta(t('unidad_titulo'), 'titulo'))
         total.addWidget(etiqueta(t('unidad_texto')))
         total.addWidget(self.lista, 1)
         total.addWidget(self.vacia)
-        total.addWidget(red)
+        total.addWidget(enlace(t('unidad_red'), self.agregar_red), 0, Qt.AlignmentFlag.AlignRight)
         total.addWidget(botones_dialogo(self, t('aceptar'), t('cancelar')))
         for u in unidades.detectar():
             self._poner(u.nombre, u.ruta, u.libre, u.total)
-        if cfg.destino and not self.lista.findItems(cfg.destino, Qt.MatchFlag.MatchContains):
+        if cfg.destino and not self._buscar(cfg.destino):
             self._poner(os.path.basename(cfg.destino) or cfg.destino, cfg.destino)
-        self._elegir_actual()
+        self.lista.setCurrentItem(self._buscar(cfg.destino))
 
     def _poner(self, nombre, ruta, libre=None, total=None):
-        texto = ruta if libre is None else t('unidad_item', nombre=nombre, ruta=ruta,
-                                             libre=tam_humano(libre), total=tam_humano(total))
-        item = W.QListWidgetItem(texto)
-        item.setData(Qt.ItemDataRole.UserRole, ruta)
-        self.lista.addItem(item)
+        datos = [f'{nombre} ({ruta})' if libre is not None else ruta]
+        datos += ['', ''] if libre is None else [tam_humano(libre), tam_humano(total)]
+        item = W.QTreeWidgetItem(datos)
+        item.setData(0, Qt.ItemDataRole.UserRole, ruta)
+        self.lista.addTopLevelItem(item)
         self.vacia.setVisible(False)
         return item
 
-    def _elegir_actual(self):
-        for i in range(self.lista.count()):
-            if self.lista.item(i).data(Qt.ItemDataRole.UserRole) == self.cfg.destino:
-                self.lista.setCurrentRow(i)
+    def _buscar(self, ruta):
+        for i in range(self.lista.topLevelItemCount()):
+            if self.lista.topLevelItem(i).data(0, Qt.ItemDataRole.UserRole) == ruta:
+                return self.lista.topLevelItem(i)
+        return None
 
     def agregar_red(self):
         ruta = W.QFileDialog.getExistingDirectory(self, t('unidad_elegir_red'), '/')
         if ruta:
-            self.lista.setCurrentItem(self._poner(os.path.basename(ruta) or ruta, ruta))
+            self.lista.setCurrentItem(self._buscar(ruta) or self._poner(os.path.basename(ruta) or ruta, ruta))
 
     def seleccion(self) -> str:
         item = self.lista.currentItem()
-        return item.data(Qt.ItemDataRole.UserRole) if item else ''
+        return item.data(0, Qt.ItemDataRole.UserRole) if item else ''
 
     def accept(self):
         if self.seleccion():

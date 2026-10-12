@@ -43,6 +43,7 @@ class Falso:
         self.cfg = api.Config(activo=False, destino='', carpetas=[self.docs, self.imgs])
         self.guardados, self.llamadas, self.restauradas, self.respuestas = [], [], [], []
         self.sondeos = 0
+        self.puntos_pedidos = []
         self.conflictos = False                 # True: restaurar() consulta `decidir` por cada archivo
         self.fechas = [datetime(2026, 10, d, 9, 30) for d in (10, 11, 12)]
         self.copias = {}
@@ -76,8 +77,9 @@ class Falso:
         return api.Estado(cfg.activo, bool(cfg.destino), self.fechas[-1], 3 * 2**30, 400 * 2**30, 465 * 2**30,
                           en_curso=en_curso)
 
-    def restaurar(self, cfg, entradas, destino_dir=None, conflicto='preguntar', decidir=None):
+    def restaurar(self, cfg, entradas, destino_dir=None, conflicto='preguntar', decidir=None, punto_id=None):
         self.restauradas.append((list(entradas), destino_dir, conflicto))
+        self.puntos_pedidos.append(punto_id)
         for e in entradas:
             if self.conflictos and decidir:
                 self.respuestas.append(decidir(e.ruta, self.version(1)))

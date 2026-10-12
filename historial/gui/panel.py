@@ -25,6 +25,7 @@ class Panel(W.QMainWindow):
         self.derecha = Derecha()
         self.derecha.activar.clicked.connect(self.alternar)
         self.derecha.ejecutar.clicked.connect(self.ejecutar)
+        self.derecha.red.clicked.connect(self.elegir_unidad)
         lateral = Lateral((('enl_restaurar', self.abrir_restaurar), ('enl_unidad', self.elegir_unidad),
                            ('enl_excluir', self.excluir), ('enl_avanzada', self.avanzada)))
         centro = W.QWidget()

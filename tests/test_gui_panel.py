@@ -9,20 +9,22 @@ from historial.gui import avanzada, unidad, unidades  # noqa: E402
 from historial.gui.excluir import Excluir  # noqa: E402
 from historial.gui.limpiar import Limpiar  # noqa: E402
 from historial.gui.panel import Panel  # noqa: E402
+from historial.gui.panel_lateral import Lateral  # noqa: E402
 
 
 def _elegir_primera_unidad(monkeypatch, ruta):
     monkeypatch.setattr(unidades, 'detectar', lambda *a, **k: [unidades.Unidad('USB', ruta, 50 * 10**9, 64 * 10**9)])
-    monkeypatch.setattr(unidad.Unidad, 'exec', lambda self: (self.lista.setCurrentRow(0), self.accept())[1])
+    monkeypatch.setattr(unidad.Unidad, 'exec', lambda self: (self.lista.setCurrentItem(self.lista.topLevelItem(0)), self.accept())[1])
 
 
 def test_panel_desactivado_muestra_los_textos_de_windows(app, falso):
     p = Panel()
     d = p.derecha
-    assert d.estado.text() == 'El Historial de archivos está desactivado'
+    assert d.caja.title() == 'Historial de archivos desactivado'
     assert d.activar.text() == 'Activar' and not d.ejecutar.isEnabled()
-    assert d.desde.text() == 'Documentos, Imagenes'
-    assert d.hacia.text() == '(sin unidad seleccionada)'
+    assert d.desde.text() == 'Documentos, Imagenes' and d.red.text() == 'Seleccionar una ubicación de red'
+    assert d.hacia.text() == 'No se encontró ninguna unidad que se pueda usar.'
+    assert d.caja_aviso.isVisibleTo(p)
     assert '12/10/2026 09:30' in d.ultima.text()
 
 
@@ -35,7 +37,7 @@ def test_activar_pide_unidad_guarda_y_lanza_la_copia(app, falso, monkeypatch, tm
     assert ('ejecutar',) in falso.llamadas
     assert p.derecha.progreso.isVisible() or p.derecha.progreso.isVisibleTo(p)
     assert esperar(app, lambda: not p.sondeo.isActive())          # la barra sigue hasta que en_curso baja
-    assert p.derecha.estado.text() == 'El Historial de archivos está activado'
+    assert p.derecha.caja.title() == 'Historial de archivos activado' and not p.derecha.caja_aviso.isVisibleTo(p)
     assert p.derecha.activar.text() == 'Desactivar' and p.derecha.ejecutar.isEnabled()
     assert not p.derecha.progreso.isVisibleTo(p)
     assert '400 GB libres de 465 GB' in p.derecha.hacia.text()
@@ -61,14 +63,17 @@ def test_enlaces_laterales_abren_cada_ventana(app, falso, monkeypatch):
     for clase in (unidad.Unidad, Excluir, avanzada.Avanzada):
         monkeypatch.setattr(clase, 'exec', lambda self, c=clase: abiertos.append(c.__name__) or 0)
     p = Panel()
-    enlaces = {b.text(): b for b in p.findChildren(type(p.derecha.activar)) if b.objectName() == 'enlace'}
+    lateral = p.findChildren(Lateral)[0]
+    enlaces = {b.text(): b for b in lateral.findChildren(type(p.derecha.activar)) if b.objectName() == 'enlace'}
     assert list(enlaces) == ['Restaurar archivos personales', 'Seleccionar unidad', 'Excluir carpetas',
                              'Configuración avanzada']
     for texto in list(enlaces)[1:]:
         enlaces[texto].click()
     assert abiertos == ['Unidad', 'Excluir', 'Avanzada']
+    p.derecha.red.click()                                            # el aviso amarillo también abre Seleccionar unidad
+    assert abiertos[-1] == 'Unidad'
     enlaces['Restaurar archivos personales'].click()
-    assert len(p.hijas) == 1 and p.hijas[0].windowTitle() == 'Restaurar archivos personales'
+    assert len(p.hijas) == 1 and p.hijas[0].windowTitle() == 'Página principal - Historial de archivos'
 
 
 def test_detectar_unidades_linux(monkeypatch):
@@ -84,7 +89,7 @@ def test_unidad_agrega_ubicacion_de_red(app, falso, monkeypatch, tmp_path):
     monkeypatch.setattr(unidades, 'detectar', lambda *a, **k: [])
     monkeypatch.setattr(unidad.W.QFileDialog, 'getExistingDirectory', lambda *a, **k: str(tmp_path))
     d = unidad.Unidad(falso.cfg)
-    assert d.seleccion() == '' and d.windowTitle().startswith('Seleccionar unidad')
+    assert d.seleccion() == '' and d.windowTitle().startswith('Seleccionar una unidad')
     d.agregar_red()
     assert d.seleccion() == str(tmp_path)
     d.accept()

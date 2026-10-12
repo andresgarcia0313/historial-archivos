@@ -1,5 +1,5 @@
 """Piezas pequeñas compartidas por las ventanas."""
-from .qt import Qt, W
+from .qt import G, Qt, W
 
 
 def etiqueta(texto: str = '', nombre: str | None = None) -> W.QLabel:
@@ -9,6 +9,14 @@ def etiqueta(texto: str = '', nombre: str | None = None) -> W.QLabel:
     if nombre:
         lbl.setObjectName(nombre)
     return lbl
+
+
+def icono(nombre: str, respaldo: str) -> G.QIcon:
+    """Icono del tema (Linux); sin tema (macOS, sesiones mínimas) el icono estándar del estilo Qt."""
+    dado = G.QIcon.fromTheme(nombre)
+    if not dado.isNull():
+        return dado
+    return W.QApplication.style().standardIcon(getattr(W.QStyle.StandardPixmap, respaldo))
 
 
 def enlace(texto: str, accion=None) -> W.QPushButton:

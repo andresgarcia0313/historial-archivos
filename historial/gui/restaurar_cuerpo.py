@@ -1,15 +1,15 @@
 """Aspecto de Restaurar archivos personales: barra superior, iconos y barra de línea de tiempo."""
 from .estilo import margenes
-from .qt import G, Qt, W
+from .qt import Qt, W
 from .restaurar_barra import BarraVersiones
 from .restaurar_vista import Vista
 from .textos import t
-from .widgets import etiqueta
+from .widgets import etiqueta, icono
 
 
-def _boton(icono: str, ayuda: str) -> W.QToolButton:
+def _boton(nombre: str, respaldo: str, ayuda: str) -> W.QToolButton:
     b = W.QToolButton()
-    b.setIcon(G.QIcon.fromTheme(icono))
+    b.setIcon(icono(nombre, respaldo))
     b.setToolTip(ayuda)
     b.setAutoRaise(True)
     return b
@@ -18,9 +18,10 @@ def _boton(icono: str, ayuda: str) -> W.QToolButton:
 class Cuerpo(W.QWidget):
     def __init__(self, padre=None):
         super().__init__(padre)
-        self.atras = _boton('go-previous', t('atras'))
-        self.adelante = _boton('go-next', t('adelante'))
-        self.arriba = _boton('go-up', t('arriba'))
+        self.atras = _boton('go-previous', 'SP_ArrowBack', t('atras'))
+        self.adelante = _boton('go-next', 'SP_ArrowForward', t('adelante'))
+        self.arriba = _boton('go-up', 'SP_ArrowUp', t('arriba'))
+        self.inicio = _boton('go-home', 'SP_DirHomeIcon', t('inicio'))
         self.ruta = W.QLineEdit()
         self.ruta.setReadOnly(True)
         self.buscar = W.QLineEdit()
@@ -29,7 +30,7 @@ class Cuerpo(W.QWidget):
         self.menu = W.QMenu(self)
         self.accion_en = self.menu.addAction(t('restaurar_en'))
         self.accion_todo = self.menu.addAction(t('sel_todo'))
-        engranaje = _boton('configure', t('engranaje'))
+        engranaje = _boton('configure', 'SP_FileDialogDetailedView', t('engranaje'))
         engranaje.setMenu(self.menu)
         engranaje.setPopupMode(W.QToolButton.ToolButtonPopupMode.InstantPopup)
         self.encabezado = etiqueta('', 'subtitulo')
@@ -42,6 +43,7 @@ class Cuerpo(W.QWidget):
             fila.addWidget(w)
         fila.addWidget(self.ruta, 3)
         fila.addWidget(self.buscar, 1)
+        fila.addWidget(self.inicio)
         fila.addWidget(engranaje)
         centro = W.QWidget()
         centro.setObjectName('contenido')

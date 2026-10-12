@@ -1,16 +1,17 @@
 """Vista de iconos grandes de "Restaurar archivos personales"."""
 from .qt import C, G, Qt, Signal, W
+from .widgets import icono
 
 _mime = C.QMimeDatabase()
 
 
 def icono_de(entrada) -> G.QIcon:
-    """Icono del tema según el tipo MIME; carpeta con su icono propio."""
+    """Icono del tema según el tipo MIME; carpeta con su icono propio; sin tema, los del estilo."""
     if entrada.es_carpeta:
-        return G.QIcon.fromTheme('folder')
+        return icono('folder', 'SP_DirIcon')
     tipo = _mime.mimeTypeForFile(entrada.nombre, C.QMimeDatabase.MatchMode.MatchExtension)
-    icono = G.QIcon.fromTheme(tipo.iconName(), G.QIcon.fromTheme(tipo.genericIconName()))
-    return icono if not icono.isNull() else G.QIcon.fromTheme('text-x-generic')
+    propio = G.QIcon.fromTheme(tipo.iconName(), G.QIcon.fromTheme(tipo.genericIconName()))
+    return propio if not propio.isNull() else icono('text-x-generic', 'SP_FileIcon')
 
 
 class Vista(W.QListView):
@@ -22,10 +23,11 @@ class Vista(W.QListView):
         self.setModel(self.modelo)
         self.setViewMode(W.QListView.ViewMode.IconMode)
         self.setIconSize(C.QSize(64, 64))
-        self.setGridSize(C.QSize(120, 110))
+        self.setGridSize(C.QSize(128, 112))
         self.setResizeMode(W.QListView.ResizeMode.Adjust)
         self.setMovement(W.QListView.Movement.Static)
         self.setWordWrap(True)
+        self.setTextElideMode(Qt.TextElideMode.ElideMiddle)
         self.setUniformItemSizes(True)
         self.setEditTriggers(W.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.setSelectionMode(W.QAbstractItemView.SelectionMode.ExtendedSelection)

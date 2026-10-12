@@ -6,8 +6,10 @@ QWidget { font-size: 10pt; }
 QMainWindow, QDialog, #contenido { background: white; }
 #titulo { color: #1e3287; font-size: 16pt; }
 #subtitulo { color: #1e3287; font-size: 12pt; }
-#estado_on { color: #1e7a1e; font-size: 12pt; }
-#estado_off { color: #444444; font-size: 12pt; }
+#aviso_caja { background: #ffffe1; border: 1px solid #d6d6a0; }
+QGroupBox#caja { border: 1px solid #c8c8c8; margin-top: 18px; padding: 14px 10px 10px 10px; }
+QGroupBox#caja::title { subcontrol-origin: margin; left: 0px; top: 0px; color: #1e3287; font-size: 12pt; }
+#seccion { color: #1e3287; border-bottom: 1px solid #c8d4f0; padding-top: 10px; }
 #aviso { color: #b00020; }
 #gris { color: #666666; }
 #lateral { background: white; border-right: 1px solid #d9d9d9; }

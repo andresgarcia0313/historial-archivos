@@ -27,6 +27,12 @@ def test_cada_texto_usado_existe_en_los_dos_idiomas():
     assert not [k for k in usadas if k not in EN], 'faltan en inglés'
 
 
+def test_no_hay_textos_muertos():
+    codigo = ''.join(open(f, encoding='utf-8').read() for f in _fuentes())
+    muertos = [k for k in ES if f"'{k}'" not in codigo]
+    assert muertos == []
+
+
 def test_los_dos_idiomas_tienen_las_mismas_claves_y_marcadores():
     assert set(ES) == set(EN)
     for clave in ES:

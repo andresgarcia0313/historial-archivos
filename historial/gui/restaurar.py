@@ -29,6 +29,7 @@ class Restaurar(W.QMainWindow):
         c.atras.clicked.connect(lambda *_: self.navegar('atras'))
         c.adelante.clicked.connect(lambda *_: self.navegar('adelante'))
         c.arriba.clicked.connect(lambda *_: self.navegar('arriba'))
+        c.inicio.clicked.connect(lambda *_: self.ir(''))
         c.accion_en.triggered.connect(lambda *_: self.restaurar_en())
         c.accion_todo.triggered.connect(lambda *_: c.vista.selectAll())
         self.recargar()
@@ -44,7 +45,10 @@ class Restaurar(W.QMainWindow):
         c.arriba.setEnabled(bool(self.nav.carpeta))
         fecha = fecha_texto(self.puntos[self.i].fecha, True) if hay else ''
         c.encabezado.setText(t('encabezado_punto', fecha=fecha, n=self.i + 1, m=len(self.puntos)) if hay else '')
-        c.estado.setText('' if entradas else t('carpeta_vacia' if hay else 'sin_copias'))
+        c.estado.setText('' if entradas else t('carpeta_vacia' if hay else self._sin_copias()))
+
+    def _sin_copias(self) -> str:
+        return 'sin_copias' if self.cfg.activo else 'restaurar_desactivado'
 
     def mover(self, paso: int):
         self.i = min(max(0, self.i + paso), len(self.puntos) - 1)
@@ -77,7 +81,8 @@ class Restaurar(W.QMainWindow):
         elegidas = self.c.vista.seleccionadas() or self.c.vista.entradas()
         if elegidas and not self.ocupado:
             self.c.estado.setText(t('restaurando'))
-            acciones.restaurar_entradas(self, self.cfg, elegidas, destino, self._restaurado)
+            punto = self.puntos[self.i].id if self.puntos else None
+            acciones.restaurar_entradas(self, self.cfg, elegidas, destino, self._restaurado, punto)
 
     def _restaurado(self, rutas, error):
         self.c.estado.setText(t('restaurar_fallo', motivo=error) if error else t('restaurado', n=len(rutas)))

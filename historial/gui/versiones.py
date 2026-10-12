@@ -9,20 +9,30 @@ from .estilo import margenes
 from .formato import fecha_texto, tam_humano
 from .qt import W
 from .textos import t
-from .widgets import etiqueta
+from .widgets import botones_dialogo, etiqueta, icono
 
 COLUMNAS = ('col_nombre', 'col_fecha', 'col_tam', 'col_ubicacion')
+
+
+def _pestana(texto: str) -> W.QWidget:
+    """Cabecera de la pestaña: icono de reloj y la explicación de dónde vienen las versiones."""
+    reloj = W.QLabel()
+    reloj.setPixmap(icono('document-open-recent', 'SP_BrowserReload').pixmap(40, 40))
+    fila = W.QHBoxLayout()
+    fila.addWidget(reloj)
+    fila.addWidget(etiqueta(texto), 1)
+    pagina = W.QWidget()
+    W.QVBoxLayout(pagina).addLayout(fila)
+    return pagina
 
 
 class Versiones(W.QDialog):
     def __init__(self, ruta: str, cfg=None, padre=None):
         super().__init__(padre)
-        self.cfg = cfg or api.cargar_config()
-        self.ruta = ruta
-        self.ocupado = False
+        self.cfg, self.ruta, self.ocupado = cfg or api.cargar_config(), ruta, False
         self.lista_versiones = api.versiones(self.cfg, ruta)
-        self.setWindowTitle(f"{t('versiones_titulo')} - {os.path.basename(ruta)}")
-        self.resize(640, 440)
+        self.setWindowTitle(t('versiones_titulo', nombre=os.path.basename(ruta)))
+        self.resize(560, 520)
         self.tabla = W.QTableWidget(len(self.lista_versiones), len(COLUMNAS))
         self.tabla.setHorizontalHeaderLabels([t(c) for c in COLUMNAS])
         self.tabla.verticalHeader().setVisible(False)
@@ -32,12 +42,20 @@ class Versiones(W.QDialog):
         self.tabla.setEditTriggers(W.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.estado = etiqueta('', 'gris')
         self._llenar()
+        pestana = W.QTabWidget()
+        pagina = W.QWidget()
+        dentro = W.QVBoxLayout(pagina)
+        margenes(dentro, 14, 8)
+        dentro.addWidget(_pestana(t('versiones_texto')))
+        dentro.addWidget(etiqueta(t('versiones_lista')))
+        dentro.addWidget(self.tabla, 1)
+        dentro.addWidget(self.estado)
+        dentro.addLayout(self._botones())
+        pestana.addTab(pagina, t('versiones_pestana'))
         total = W.QVBoxLayout(self)
-        margenes(total, 20, 10)
-        total.addWidget(etiqueta(t('versiones_lista')))
-        total.addWidget(self.tabla, 1)
-        total.addWidget(self.estado)
-        total.addLayout(self._botones())
+        margenes(total, 12, 10)
+        total.addWidget(pestana, 1)
+        total.addWidget(botones_dialogo(self, t('aceptar'), t('cancelar')))
 
     def _llenar(self):
         for fila, v in enumerate(self.lista_versiones):
@@ -57,12 +75,10 @@ class Versiones(W.QDialog):
         menu.addAction(t('restaurar_en')).triggered.connect(lambda *_: self.restaurar_en())
         self.boton_restaurar = W.QPushButton(t('restaurar'))
         self.boton_restaurar.setMenu(menu)
-        cerrar = W.QPushButton(t('cerrar'))
-        cerrar.clicked.connect(self.reject)
         fila = W.QHBoxLayout()
         fila.addStretch(1)
-        for b in (self.abrir, self.boton_restaurar, cerrar):
-            fila.addWidget(b)
+        fila.addWidget(self.abrir)
+        fila.addWidget(self.boton_restaurar)
         return fila
 
     def seleccionada(self):

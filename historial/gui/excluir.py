@@ -13,17 +13,16 @@ class Excluir(W.QDialog):
         super().__init__(padre)
         self.cfg = cfg
         self.setWindowTitle(t('excluir_titulo'))
-        self.resize(640, 560)
-        self.excluidas = ListaRutas(t('excluir_lista'), t('agregar'), cfg.excluir)
+        self.resize(640, 600)
+        self.excluidas = ListaRutas(t('excluir_lista'), t('agregar'), cfg.excluir, t('excluir_vacia'))
         self.incluidas = ListaRutas(t('incluir_lista'), t('incluir_agregar'), cfg.carpetas)
-        cajon = botones_dialogo(self, t('guardar'), t('cancelar'))
         total = W.QVBoxLayout(self)
-        margenes(total, 24, 14)
+        margenes(total, 24, 12)
         total.addWidget(etiqueta(t('excluir_titulo'), 'titulo'))
-        total.addWidget(etiqueta(t('excluir_texto'), 'gris'))
+        total.addWidget(etiqueta(t('excluir_texto')))
         total.addWidget(self.excluidas, 1)
         total.addWidget(self.incluidas, 1)
-        total.addWidget(cajon)
+        total.addWidget(botones_dialogo(self, t('guardar'), t('cancelar')))
 
     def accept(self):
         self.cfg.excluir = self.excluidas.rutas()

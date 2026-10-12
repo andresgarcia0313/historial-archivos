@@ -28,7 +28,7 @@ def test_linea_de_tiempo_anterior_siguiente(app, falso):
     assert _nombres(w.c.vista) == ['Documentos', 'Imagenes']
     _entrar_en_documentos(falso, w)
     assert _nombres(w.c.vista) == ['foto.png', 'informe.txt', 'notas.md']
-    assert w.c.ruta.text() == 'Inicio  ›  Documentos'
+    assert w.c.ruta.text() == 'Página principal  ›  Documentos'
     w.c.barra.atras.click()
     assert w.c.encabezado.text().endswith('2 de 3') and _nombres(w.c.vista) == ['informe.txt', 'notas.md']
     w.c.barra.atras.click()
@@ -46,7 +46,7 @@ def test_navegacion_atras_adelante_arriba_y_busqueda(app, falso):
     _entrar_en_documentos(falso, w)
     assert w.c.atras.isEnabled() and w.c.arriba.isEnabled() and not w.c.adelante.isEnabled()
     w.c.arriba.click()                                               # como el Explorador: Subir es un paso nuevo
-    assert w.nav.carpeta == '' and w.c.ruta.text() == 'Inicio' and not w.c.adelante.isEnabled()
+    assert w.nav.carpeta == '' and w.c.ruta.text() == 'Página principal' and not w.c.adelante.isEnabled()
     w.c.atras.click()
     assert w.nav.carpeta == falso.docs and w.c.adelante.isEnabled()
     w.c.adelante.click()
@@ -61,8 +61,8 @@ def test_navegacion_atras_adelante_arriba_y_busqueda(app, falso):
 def test_ayudas_de_navegacion():
     raices = ['/home/a/Documentos', '/home/a/Imagenes']
     assert padre_de('/home/a/Documentos', raices) == '' and padre_de('/home/a/Documentos/x/y', raices) == '/home/a/Documentos/x'
-    assert miga('/home/a/Documentos/x/y', raices) == 'Inicio  ›  Documentos  ›  x  ›  y'
-    assert miga('/otra/ruta', raices) == 'Inicio  ›  otra  ›  ruta'
+    assert miga('/home/a/Documentos/x/y', raices) == 'Página principal  ›  Documentos  ›  x  ›  y'
+    assert miga('/otra/ruta', raices) == 'Página principal  ›  otra  ›  ruta'
     n = Navegacion('')
     n.ir('a')
     n.ir('b')
@@ -80,7 +80,7 @@ def test_boton_verde_restaura_a_la_ubicacion_original(app, falso):
     assert esperar(app, lambda: 'Se restauraron 2' in w.c.estado.text())
     entradas, destino, modo = falso.restauradas[0]
     assert [e.nombre for e in entradas] == ['informe.txt', 'notas.md'] and destino is None and modo == 'preguntar'
-    assert not w.ocupado
+    assert not w.ocupado and falso.puntos_pedidos == [2]             # carpetas: del punto que se está viendo
 
 
 def test_restaurar_seleccion_en_otra_carpeta(app, falso, monkeypatch, tmp_path):
@@ -158,6 +158,9 @@ def test_doble_clic_en_archivo_abre_copia_temporal_de_solo_lectura(app, falso, m
 def test_sin_copias(app, falso, monkeypatch):
     monkeypatch.setattr(falso, 'puntos', lambda cfg: [])
     monkeypatch.setattr('historial.gui.restaurar.api.puntos', falso.puntos)
+    w = Restaurar()
+    assert w.c.estado.text() == 'El Historial de archivos está desactivado actualmente. Configure el Historial de archivos.'
+    falso.cfg.activo = True
     w = Restaurar()
     assert w.c.estado.text() == 'Todavía no hay copias para restaurar.' and w.c.encabezado.text() == ''
     assert not w.c.barra.verde.isEnabled()
