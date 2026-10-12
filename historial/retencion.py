@@ -87,6 +87,7 @@ def limpiar(cfg: Config, anteriores_a_dias: int | None) -> int:
     try:
         liberado = _eliminar_antiguas(cfg, cat, anteriores_a_dias)
         _podar_puntos(cat)
+        cat.db.commit()
         try:
             cat.exportar(destino.catalogo_remoto(cfg))
         except (OSError, sqlite3.Error):
