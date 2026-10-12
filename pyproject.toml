@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "historial-archivos"
+dynamic = ["version"]
+description = "Historial de archivos al estilo de Windows para Linux y macOS / Windows-style File History for Linux and macOS"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Andrés García" }]
+keywords = ["backup", "file-history", "copias-de-seguridad", "qt", "pyside6"]
+classifiers = [
+  "Environment :: X11 Applications :: Qt",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Programming Language :: Python :: 3",
+  "Topic :: System :: Archiving :: Backup",
+]
+dependencies = ["PySide6>=6.5"]
+
+[project.optional-dependencies]
+pyqt6 = ["PyQt6>=6.4"]
+dev = ["pytest>=8", "pyinstaller>=6.10"]
+
+[project.scripts]
+historial-archivos = "historial.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/andresgarcia0313/historial-archivos"
+
+[tool.setuptools.dynamic]
+version = { attr = "historial.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["historial*"]
+
+[tool.setuptools.package-data]
+historial = ["**/*.svg", "**/*.png", "**/*.qm"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,21 @@
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=File History
+Name[es]=Historial de archivos
+Comment=Keep versions of your personal files and restore them from a timeline
+Comment[es]=Guarda versiones de tus archivos personales y restáuralas desde una línea de tiempo
+GenericName=Backup
+GenericName[es]=Copias de seguridad
+Exec=historial-archivos
+Icon=io.github.andresgarcia0313.HistorialArchivos
+Terminal=false
+Categories=Utility;System;Archiving;
+Keywords=backup;history;restore;versions;historial;copias;restaurar;versiones;
+StartupWMClass=historial-archivos
+Actions=restaurar;
+
+[Desktop Action restaurar]
+Name=Restore personal files
+Name[es]=Restaurar archivos personales
+Exec=historial-archivos --restaurar
