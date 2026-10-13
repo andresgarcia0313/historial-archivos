@@ -11,7 +11,7 @@ _POR_EXTENSION = {ext: nombre for nombre, exts in CATEGORIAS.items() for ext in 
 
 def extension(nombre: str) -> str:
     """Extensión en minúsculas y sin punto; '' si no tiene (los ocultos como '.bashrc' tampoco)."""
-    base = os.path.basename(nombre)
+    base = nombre[max(nombre.rfind('/'), nombre.rfind(os.sep)) + 1:]      # basename sin su sobrecosto
     punto = base.rfind('.')
     return base[punto + 1:].lower() if punto > 0 else ''
 
