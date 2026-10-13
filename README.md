@@ -10,6 +10,8 @@ tiempo con los botones Anterior, Restaurar y Siguiente.
 
 ![Panel principal](docs/panel.png)
 ![Restaurar archivos personales](docs/restaurar.png)
+![Uso del espacio](docs/uso.png)
+![Otras copias de seguridad](docs/otras.png)
 
 ### Características
 
@@ -21,6 +23,10 @@ tiempo con los botones Anterior, Restaurar y Siguiente.
 - Interfaz Qt (PySide6, o PyQt6 como alternativa) con las mismas páginas del Panel de control
   de Windows: Seleccionar unidad, Excluir carpetas, Configuración avanzada, Restaurar archivos
   personales y Versiones anteriores.
+- Tema Drácula (por defecto), Alucard claro o según el sistema, con diseño guiado por las Human Interface Guidelines de Apple.
+- Uso del espacio: cuánto ocupan las copias por tipo de archivo, por carpeta y por mes, los archivos más grandes y los más versionados, y limpieza por tipo o carpeta.
+- Tipos de archivo: elige qué categorías copiar (documentos, hojas de cálculo, imágenes...) y qué extensiones excluir; filtro por tipo al restaurar.
+- Otras copias de seguridad: detecta Back In Time, Déjà Dup, Timeshift, Time Machine y carpetas del Historial en unidades conectadas, y permite cambiar su programación, carpetas y exclusiones.
 - Menú contextual en Dolphin y Nautilus: «Versiones anteriores» y «Restaurar archivos
   personales».
 
