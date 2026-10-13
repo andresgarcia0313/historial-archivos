@@ -5,7 +5,7 @@ import os
 import sqlite3
 import time
 
-from . import bloqueo, catalogo, destino, escaneo, escritura, estado, retencion
+from . import bloqueo, catalogo, destino, escaneo, escritura, estado, retencion, tipos
 from .api import Config, Resumen
 
 
@@ -16,6 +16,7 @@ def _trabajar(cfg: Config, cat, progreso, resumen: Resumen) -> None:
     vigentes = cat.vigentes()
     excluir = {os.path.normpath(x) for x in cfg.excluir} | {os.path.normpath(destino.raiz_historial(cfg))}
     limite = cfg.max_tam_mb * (1 << 20)
+    se_copia = tipos.filtro(cfg)
     vistos, inseguros, pendientes, escaneadas = set(), [], [], []
     if progreso:
         progreso('Buscando cambios', 0.0)
@@ -26,7 +27,9 @@ def _trabajar(cfg: Config, cat, progreso, resumen: Resumen) -> None:
         escaneadas.append(carpeta)
         for ruta, info in escaneo.recorrer(carpeta, excluir, cfg.patrones, inseguros):
             resumen.revisados += 1
-            vistos.add(ruta)
+            vistos.add(ruta)                   # filtrado por tipo sigue existiendo: no se da por borrado
+            if not se_copia(ruta):
+                continue
             if escaneo.cambio(ruta, info, vigentes) and not (limite and info.st_size > limite):
                 pendientes.append((ruta, info))
     escritura.copiar_pendientes(cfg, cat, pendientes, vigentes, punto, hasta, resumen, marca, progreso)

@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from .contrato_uso import CATEGORIAS, Grupo, Uso  # noqa: F401  (contrato v1.1, reexportado)
+
 FRECUENCIAS_MIN = (10, 15, 20, 30, 60, 180, 360, 720, 1440)      # como Windows; 60 por defecto
 CONSERVAR_DIAS = (-1, 30, 90, 180, 270, 365, 730, 0)               # -1 = hasta que se necesite espacio, 0 = siempre
 PATRONES_DEFECTO = ['~$*', '.~lock.*#', '*.tmp', '*.partial', '*.crdownload', '*~', '.Trash-*',
@@ -26,6 +28,8 @@ class Config:
     frecuencia_min: int = 60
     conservar_dias: int = 0
     max_tam_mb: int = 2048                 # archivos más grandes no se copian (0 = sin límite)
+    tipos: list[str] = field(default_factory=list)       # categorías de CATEGORIAS a copiar; vacío = todas
+    extensiones_excluidas: list[str] = field(default_factory=list)   # sin punto; nunca se copian
 
 
 @dataclass
@@ -130,3 +134,19 @@ def ejecutar_en_segundo_plano() -> None:                            # lanza la c
     from . import programador
     subprocess.Popen(programador.comando() + ['--ahora'], start_new_session=True, close_fds=True,
                      stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def categoria_de(nombre: str) -> str:                               # por extensión; 'otros' si no encaja
+    from . import tipos
+    return tipos.categoria_de(nombre)
+
+
+def uso(cfg: Config) -> Uso:                                        # solo lee el catálogo
+    from . import uso as modulo
+    return modulo.uso(cfg)
+
+
+def limpiar_filtrado(cfg: Config, categoria: str | None = None, carpeta: str | None = None,
+                     anteriores_a_dias: int | None = None, incluso_la_ultima: bool = False) -> int:
+    from . import limpieza                                          # conserva la última salvo incluso_la_ultima
+    return limpieza.limpiar_filtrado(cfg, categoria, carpeta, anteriores_a_dias, incluso_la_ultima)
