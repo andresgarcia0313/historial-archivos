@@ -1,5 +1,6 @@
 """Utilidades de las pruebas de la GUI: aplicación offscreen y un motor falso (monkeypatch de historial.api)."""
 import os
+import tempfile
 import time
 
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
@@ -8,7 +9,10 @@ os.environ.setdefault('HISTORIAL_IDIOMA', 'es')
 import pytest
 
 from historial.gui import estilo
-from historial.gui.qt import W
+from historial.gui.qt import C, W
+
+# La elección de tema vive en QSettings: en pruebas, un directorio temporal (nunca la config real del usuario).
+C.QSettings.setPath(C.QSettings.Format.IniFormat, C.QSettings.Scope.UserScope, tempfile.mkdtemp(prefix='hist-gui-'))
 
 
 @pytest.fixture(scope='session')

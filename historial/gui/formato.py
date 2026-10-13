@@ -17,6 +17,12 @@ def tam_humano(n: int) -> str:
     return f'{texto} {unidad}'
 
 
+def numero(n, decimales: int = 0) -> str:
+    """12.345 o 1,5 en español; 12,345 o 1.5 en inglés."""
+    local = C.QLocale(idioma())
+    return local.toString(int(n)) if decimales == 0 else local.toString(float(n), 'f', decimales)
+
+
 def _qfecha(fecha):
     return C.QDateTime(C.QDate(fecha.year, fecha.month, fecha.day),
                        C.QTime(fecha.hour, fecha.minute, fecha.second))

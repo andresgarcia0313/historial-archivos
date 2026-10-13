@@ -1,8 +1,11 @@
-"""Vista de iconos grandes de "Restaurar archivos personales"."""
+"""Vista de iconos grandes de "Restaurar archivos personales", con filtro por nombre y por tipo de archivo."""
+from historial import api
+
 from .qt import C, G, Qt, Signal, W
 from .widgets import icono
 
 _mime = C.QMimeDatabase()
+_TIPO = Qt.ItemDataRole.UserRole + 1
 
 
 def icono_de(entrada) -> G.QIcon:
@@ -19,6 +22,7 @@ class Vista(W.QListView):
 
     def __init__(self, padre=None):
         super().__init__(padre)
+        self.texto, self.tipo = '', None
         self.modelo = G.QStandardItemModel(self)
         self.setModel(self.modelo)
         self.setViewMode(W.QListView.ViewMode.IconMode)
@@ -38,7 +42,9 @@ class Vista(W.QListView):
             item = G.QStandardItem(icono_de(entrada), entrada.nombre)
             item.setData(entrada, Qt.ItemDataRole.UserRole)
             item.setToolTip(entrada.ruta)
+            item.setData(None if entrada.es_carpeta else api.categoria_de(entrada.nombre), _TIPO)
             self.modelo.appendRow(item)
+        self._aplicar()
 
     def entradas(self) -> list:
         """Todas las entradas visibles (no ocultas por la búsqueda)."""
@@ -49,6 +55,17 @@ class Vista(W.QListView):
         return [i.data(Qt.ItemDataRole.UserRole) for i in self.selectedIndexes()]
 
     def filtrar(self, texto: str) -> None:
-        texto = texto.strip().lower()
+        self.texto = texto.strip().lower()
+        self._aplicar()
+
+    def filtrar_tipo(self, categoria) -> None:
+        """Solo los archivos de esa categoría (las carpetas siempre se ven para poder entrar); None = todos."""
+        self.tipo = categoria
+        self._aplicar()
+
+    def _aplicar(self) -> None:
         for i in range(self.modelo.rowCount()):
-            self.setRowHidden(i, bool(texto) and texto not in self.modelo.item(i).text().lower())
+            item = self.modelo.item(i)
+            oculta_texto = bool(self.texto) and self.texto not in item.text().lower()
+            oculta_tipo = bool(self.tipo) and item.data(_TIPO) not in (None, self.tipo)
+            self.setRowHidden(i, oculta_texto or oculta_tipo)

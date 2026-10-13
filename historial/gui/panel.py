@@ -1,42 +1,61 @@
-"""Ventana principal: Historial de archivos (Panel de control)."""
+"""Ventana principal: Historial de archivos (Panel de control) con sus páginas laterales."""
 from historial import api
 
 from . import carpetas_base
-from .avanzada import Avanzada
-from .excluir import Excluir
+from .otras_pagina import OtrasPagina
+from .panel_ventanas import Ventanas
 from .panel_derecha import Derecha
 from .panel_lateral import Lateral
 from .qt import C, Qt, W
-from .restaurar import Restaurar
 from .textos import t
-from .unidad import Unidad
+from .tipos_pagina import TiposPagina
+from .uso_pagina import UsoPagina
+
+PAGINAS = ('pag_inicio', 'pag_uso', 'pag_tipos', 'pag_otras')
 
 
-class Panel(W.QMainWindow):
+class Panel(Ventanas, W.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(t('titulo_ventana'))
-        self.resize(900, 560)
-        self.hijas = []
-        self.espera = 0
+        self.resize(960, 640)
+        self.setMinimumSize(720, 480)
+        self.hijas, self.espera = [], 0
         self.sondeo = C.QTimer(self)
         self.sondeo.setInterval(1000)
         self.sondeo.timeout.connect(self.sondear)
+        self.cfg = api.cargar_config()
         self.derecha = Derecha()
         self.derecha.activar.clicked.connect(self.alternar)
         self.derecha.ejecutar.clicked.connect(self.ejecutar)
         self.derecha.red.clicked.connect(self.elegir_unidad)
-        lateral = Lateral((('enl_restaurar', self.abrir_restaurar), ('enl_unidad', self.elegir_unidad),
-                           ('enl_excluir', self.excluir), ('enl_avanzada', self.avanzada)))
+        self.uso, self.tipos, self.otras = UsoPagina(self.cfg), TiposPagina(self.cfg), OtrasPagina()
+        self.paginas = W.QStackedWidget()
+        for pagina in (self.derecha, self.uso, self.tipos, self.otras):
+            self.paginas.addWidget(pagina)
+        self.lateral = Lateral((('enl_restaurar', self.abrir_restaurar), ('enl_unidad', self.elegir_unidad),
+                                ('enl_excluir', self.excluir), ('enl_avanzada', self.avanzada)),
+                               PAGINAS, self.ir)
         centro = W.QWidget()
         centro.setObjectName('contenido')
         fila = W.QHBoxLayout(centro)
         fila.setContentsMargins(0, 0, 0, 0)
         fila.setSpacing(0)
-        fila.addWidget(lateral)
-        fila.addWidget(self.derecha, 1)
+        fila.addWidget(self.lateral)
+        fila.addWidget(self.paginas, 1)
         self.setCentralWidget(centro)
+        centro.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        centro.setFocus()                                   # sin anillo de foco al abrir; Tab entra al lateral
         self.refrescar()
+
+    def ir(self, indice: int) -> None:
+        """Muestra la página `indice` del panel lateral con la configuración vigente."""
+        self.lateral.marcar(indice)
+        self.paginas.setCurrentIndex(indice)
+        pagina = self.paginas.currentWidget()
+        if pagina is not self.derecha:
+            pagina.cfg = self.cfg
+            pagina.al_mostrar()
 
     def refrescar(self):
         self.cfg = api.cargar_config()
@@ -77,22 +96,3 @@ class Panel(W.QMainWindow):
         if not self.cfg.carpetas:
             self.cfg.carpetas = carpetas_base.predeterminadas()
         return bool(self.cfg.destino)
-
-    def _dialogo(self, clase):
-        clase(self.cfg, self).exec()
-        self.refrescar()
-
-    def elegir_unidad(self):
-        self._dialogo(Unidad)
-
-    def excluir(self):
-        self._dialogo(Excluir)
-
-    def avanzada(self):
-        self._dialogo(Avanzada)
-
-    def abrir_restaurar(self):
-        ventana = Restaurar(cfg=self.cfg)
-        ventana.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        ventana.show()
-        self.hijas.append(ventana)

@@ -44,7 +44,7 @@ class Limpiar(W.QDialog):
     def limpiar(self):
         dias = self.combo.currentData()
         self.boton.setEnabled(False)
-        self.resultado.setText(t('copiando'))
+        self.resultado.setText(t('limpiando'))
         self.tarea = lanzar(self, lambda: api.limpiar(self.cfg, dias), self._listo, self._fallo)
 
     def _listo(self, bytes_liberados):

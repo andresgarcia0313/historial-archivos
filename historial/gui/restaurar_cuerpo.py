@@ -1,4 +1,5 @@
 """Aspecto de Restaurar archivos personales: barra superior, iconos y barra de línea de tiempo."""
+from . import categorias, tema
 from .estilo import margenes
 from .qt import Qt, W
 from .restaurar_barra import BarraVersiones
@@ -9,7 +10,7 @@ from .widgets import etiqueta, icono
 
 def _boton(nombre: str, respaldo: str, ayuda: str, atajo: str = '') -> W.QToolButton:
     b = W.QToolButton()
-    b.setIcon(icono(nombre, respaldo))
+    b.setIcon(icono(nombre, respaldo, tema.color('texto')))
     b.setToolTip(ayuda)
     b.setAutoRaise(True)
     if atajo:
@@ -30,6 +31,12 @@ class Cuerpo(W.QWidget):
         self.buscar = W.QLineEdit()
         self.buscar.setPlaceholderText(t('buscar'))
         self.buscar.setClearButtonEnabled(True)
+        self.tipo = W.QComboBox()
+        self.tipo.setToolTip(t('filtro_tipo'))
+        self.tipo.setAccessibleName(t('filtro_tipo'))
+        self.tipo.addItem(t('todos_tipos'), None)
+        for categoria in categorias.ORDEN:
+            self.tipo.addItem(categorias.nombre(categoria), categoria)
         self.menu = W.QMenu(self)
         self.accion_en = self.menu.addAction(t('restaurar_en'))
         self.accion_todo = self.menu.addAction(t('sel_todo'))
@@ -41,12 +48,14 @@ class Cuerpo(W.QWidget):
         self.estado = etiqueta('', 'gris')
         self.estado.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.vista = Vista()
+        self.tipo.currentIndexChanged.connect(lambda *_: self.vista.filtrar_tipo(self.tipo.currentData()))
         self.barra = BarraVersiones()
         fila = W.QHBoxLayout()
         for w in (self.atras, self.adelante, self.arriba):
             fila.addWidget(w)
         fila.addWidget(self.ruta, 3)
         fila.addWidget(self.actualizar)
+        fila.addWidget(self.tipo)
         fila.addWidget(self.buscar, 1)
         for w in (self.inicio, self.engranaje):
             fila.addWidget(w)

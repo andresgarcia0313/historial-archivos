@@ -79,4 +79,5 @@ def test_la_gui_solo_usa_la_api_publica():
     for ruta in _fuentes():
         for linea in open(ruta, encoding='utf-8'):
             if linea.startswith(('from historial', 'import historial')):
-                assert re.match(r'(from historial import api|from historial\.api import \w+)', linea), (ruta, linea)
+                patron = r'from historial( import (api|otras)$|\.(api|contrato_uso|otras) import \w+)'
+                assert re.match(patron, linea.strip()), (ruta, linea)
