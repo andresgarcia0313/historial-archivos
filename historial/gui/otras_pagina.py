@@ -58,8 +58,11 @@ class OtrasPagina(Pagina):
 
     def _medir(self, tarjeta) -> None:
         copia = tarjeta.copia
-        self.tareas.append(lanzar(self, lambda: otras.tamano(copia), tarjeta.poner_tam,
-                                  lambda *_: tarjeta.poner_tam(None)))
+
+        def poner(bytes_=None):
+            if tarjeta in self.tarjetas:          # la tarjeta pudo cambiar si se buscó de nuevo mientras medía
+                tarjeta.poner_tam(bytes_ if isinstance(bytes_, int) else None)
+        self.tareas.append(lanzar(self, lambda: otras.tamano(copia), poner, lambda *_: poner(None)))
 
     def abrir(self, copia) -> None:
         if not otras.abrir_herramienta(copia):

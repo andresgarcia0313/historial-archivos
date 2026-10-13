@@ -14,7 +14,7 @@ from .widgets import confirmar, etiqueta
 
 
 class LimpiarFiltro(W.QFrame):
-    limpiado = Signal(int)
+    limpiado = Signal(object)        # bytes liberados (pueden pasar de 2 GB: no cabe en int de 32 bits)
 
     def __init__(self, cfg, padre=None):
         super().__init__(padre)

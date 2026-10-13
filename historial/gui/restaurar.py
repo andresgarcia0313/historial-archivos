@@ -31,6 +31,7 @@ class Restaurar(W.QMainWindow):
         c.accion_en.triggered.connect(lambda *_: self.restaurar_en())
         c.accion_todo.triggered.connect(lambda *_: c.vista.selectAll())
         self.actualizar()
+        c.vista.setFocus()
 
     def actualizar(self):
         """Vuelve a leer las copias (F5) y se coloca en la más reciente."""

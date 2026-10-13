@@ -12,12 +12,15 @@ def _tabla() -> W.QTableWidget:
     tabla = W.QTableWidget(0, len(COLUMNAS))
     tabla.setHorizontalHeaderLabels([t(c) for c in COLUMNAS])
     tabla.verticalHeader().setVisible(False)
+    for col in (2, 3):                                     # las cifras, alineadas a la derecha como sus valores
+        tabla.horizontalHeaderItem(col).setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
     tabla.setEditTriggers(W.QAbstractItemView.EditTrigger.NoEditTriggers)
     tabla.setSelectionBehavior(W.QAbstractItemView.SelectionBehavior.SelectRows)
     tabla.setShowGrid(False)
     tabla.setAlternatingRowColors(True)
     tabla.setMinimumHeight(220)
     cabecera = tabla.horizontalHeader()
+    cabecera.setDefaultAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
     cabecera.setSectionResizeMode(1, W.QHeaderView.ResizeMode.Stretch)
     for col in (0, 2, 3):
         cabecera.setSectionResizeMode(col, W.QHeaderView.ResizeMode.ResizeToContents)

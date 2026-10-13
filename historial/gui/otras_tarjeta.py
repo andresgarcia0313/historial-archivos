@@ -26,7 +26,7 @@ class TarjetaCopia(W.QFrame):
         cabeza = W.QHBoxLayout()
         cabeza.addWidget(self.titulo, 1)
         cabeza.addWidget(self.pildora, 0, Qt.AlignmentFlag.AlignTop)
-        self.tam = etiqueta(t('otras_midiendo'), 'gris')
+        self.tam = etiqueta(t('otras_midiendo'))
         datos = W.QFormLayout()
         datos.setHorizontalSpacing(16)
         datos.setVerticalSpacing(4)

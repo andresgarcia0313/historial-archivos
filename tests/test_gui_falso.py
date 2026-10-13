@@ -5,6 +5,7 @@ from datetime import datetime
 import pytest
 
 from historial import api
+from test_gui_falso_v11 import parchear_v11
 
 
 class Falso:
@@ -70,6 +71,7 @@ class Falso:
         mp.setattr(api, 'restaurar', self.restaurar)
         mp.setattr(api, 'limpiar', lambda cfg, dias: self.llamadas.append(('limpiar', dias)) or 2048)
         mp.setattr(api, 'ejecutar_en_segundo_plano', lambda: self._lanzar())
+        parchear_v11(self, mp)
 
     def _lanzar(self):
         self.llamadas.append(('ejecutar',))

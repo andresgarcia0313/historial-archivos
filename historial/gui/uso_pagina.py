@@ -14,7 +14,7 @@ from .uso_limpiar import LimpiarFiltro
 from .uso_tablas import Tablas
 from .widgets import etiqueta
 
-CIFRAS = ('cifra_copias', 'cifra_actual', 'cifra_libre', 'cifra_archivos', 'cifra_versiones')
+CIFRAS = ('cifra_copias', 'cifra_actual', 'cifra_libre', 'cifra_archivos', 'cifra_versiones', 'cifra_primera')
 
 
 def _mes(nombre: str) -> str:
@@ -29,15 +29,13 @@ class UsoPagina(Pagina):
         self.cfg, self.tarea = cfg, None
         self.estado = etiqueta('', 'gris')
         self.cifras = Rejilla({c: t(c) for c in CIFRAS})
-        self.periodo = etiqueta('', 'gris')
         self.por_tipo, self.por_carpeta, self.por_mes = BarrasH(), BarrasH(), BarrasV()
         self.tablas = Tablas()
         self.limpieza = LimpiarFiltro(cfg)
         self.limpieza.limpiado.connect(lambda *_: self.al_mostrar())
         self.cuerpo.addWidget(self.estado)
         self.cuerpo.addWidget(self.cifras)
-        self.cuerpo.addWidget(self.periodo)
-        self.detalle = [self.cifras, self.periodo]
+        self.detalle = [self.cifras]
         for titulo, widget in (('sec_por_tipo', self.por_tipo), ('sec_por_carpeta', self.por_carpeta),
                                ('sec_por_mes', self.por_mes), ('sec_detalle', self.tablas),
                                ('sec_limpiar_filtro', self.limpieza)):
@@ -54,6 +52,7 @@ class UsoPagina(Pagina):
         """Calcula el uso en segundo plano; mientras tanto la página dice qué está haciendo."""
         if self.tarea is not None:
             return
+        self.limpieza.cfg = self.cfg
         self.estado.setText(t('uso_calculando'))
         self.estado.setVisible(True)
         self.tarea = lanzar(self, lambda: api.uso(self.cfg), self.mostrar, self._fallo)
@@ -78,8 +77,8 @@ class UsoPagina(Pagina):
         promedio = u.versiones / max(1, u.archivos)
         detalle = t('cifra_por_archivo') if promedio <= 1 else t('cifra_promedio', n=numero(promedio, 1))
         c['cifra_versiones'].poner(numero(u.versiones), detalle)
-        self.periodo.setText(t('uso_periodo', primera=fecha_texto(u.primera), ultima=fecha_texto(u.ultima))
-                             if u.primera and u.ultima else '')
+        ultima = t('cifra_ultima', fecha=fecha_texto(u.ultima)) if u.ultima else ''
+        c['cifra_primera'].poner(fecha_texto(u.primera).split(' ')[0] or '-', ultima)
         self.por_tipo.poner([(categorias.nombre(g.nombre), g.bytes, tam_humano(g.bytes)) for g in u.por_categoria])
         self.por_carpeta.poner([(os.path.basename(g.nombre.rstrip('/')) or g.nombre, g.bytes, tam_humano(g.bytes))
                                 for g in u.por_carpeta])

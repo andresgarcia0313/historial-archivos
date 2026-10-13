@@ -15,6 +15,7 @@ class Cifra(W.QFrame):
         caja.setSpacing(2)
         for w in (self.rotulo, self.valor, self.detalle):
             caja.addWidget(w)
+        caja.addStretch(1)
         self.setAccessibleName(rotulo)
 
     def poner(self, valor: str, detalle: str = '') -> None:

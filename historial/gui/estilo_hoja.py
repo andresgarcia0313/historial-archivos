@@ -7,19 +7,22 @@ QMainWindow, QDialog, #contenido, #pagina, #pagina_cuerpo { background: $fondo; 
 QLabel { background: transparent; }
 #titulo { font-size: 17pt; font-weight: 600; }
 #subtitulo { font-size: 12pt; font-weight: 600; }
-#seccion { font-size: 11pt; font-weight: 600; padding-top: 16px; }
+#seccion { font-size: 11pt; font-weight: 600; margin-top: 16px; }
 #gris { color: $secundario; }
+#gris:disabled { color: $apagado; }
 #aviso { color: $naranja; }
 #cifra { font-size: 18pt; font-weight: 600; }
 #grupo_lateral { color: $secundario; font-size: 9pt; font-weight: 600; padding: 16px 8px 4px 8px; }
 #aviso_caja { background: $aviso_fondo; border: 1px solid $naranja; border-radius: 8px; }
-QGroupBox#caja { background: $tarjeta; border: 1px solid $borde; border-radius: 10px;
+QGroupBox#caja { font-size: 12pt; font-weight: 600; background: $tarjeta; border: 1px solid $borde; border-radius: 10px;
                  margin-top: 32px; padding: 16px; }
-QGroupBox#caja::title { subcontrol-origin: margin; left: 0px; top: 0px; font-size: 12pt; font-weight: 600; }
+QGroupBox#caja::title { subcontrol-origin: margin; left: 0px; top: 0px; }
+QGroupBox#caja QLabel { font-weight: 400; }
 #tarjeta { background: $tarjeta; border: 1px solid $borde; border-radius: 10px; }
 #lateral { background: $lateral; border-right: 1px solid $borde; }
 QPushButton#enlace, QToolButton#enlace { color: $cian; background: transparent; border: 2px solid transparent;
-    border-radius: 6px; text-align: left; padding: 4px 8px; min-width: 0px; }
+    border-radius: 6px; text-align: left; padding: 4px 0px; min-width: 0px; }
+#lateral QPushButton#enlace { padding: 4px 8px; }
 QPushButton#enlace:hover { background: $hover; }
 QPushButton#enlace:disabled { color: $apagado; }
 QPushButton#pagina_lateral { color: $texto; background: transparent; border: 2px solid transparent;
@@ -31,12 +34,11 @@ QPushButton { background: $tarjeta; color: $texto; border: 1px solid $borde_cont
 QPushButton:hover { background: $hover; }
 QPushButton:pressed { background: $seleccion; }
 QPushButton:disabled { color: $apagado; border-color: $borde; }
-QPushButton#primario, QPushButton:default { background: $acento; color: $sobre_acento; border: 2px solid $acento;
-                                            font-weight: 600; }
+QPushButton#primario { background: $acento; color: $sobre_acento; border: 2px solid $acento; font-weight: 600; }
 QPushButton#primario:disabled { background: $seleccion; color: $apagado; border-color: $seleccion; }
 QPushButton#peligro { color: $texto; border: 1px solid $rojo; }
 QPushButton:focus, QPushButton#enlace:focus, QPushButton#pagina_lateral:focus { border: 2px solid $acento; }
-QPushButton#primario:focus, QPushButton:default:focus { border: 2px solid $texto; }
+QPushButton#primario:focus { border: 2px solid $texto; }
 QLineEdit, QComboBox, QSpinBox { background: $campo; color: $texto; border: 1px solid $borde_control;
     border-radius: 6px; padding: 5px 8px; min-height: 20px; selection-background-color: $seleccion; }
 QLineEdit:focus, QComboBox:focus, QSpinBox:focus { border: 2px solid $acento; }

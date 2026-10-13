@@ -35,9 +35,10 @@ class TiposPagina(Pagina):
             muestra = categorias.ejemplos(categoria)
             casilla.setToolTip(muestra)
             rejilla.addWidget(casilla, (i // 2) * 2, i % 2)
-            rejilla.addWidget(etiqueta(muestra, 'gris'), (i // 2) * 2 + 1, i % 2)
+            ayuda = etiqueta(muestra, 'gris')
+            ayuda.setContentsMargins(26, 0, 0, 4)          # alineada con el texto de la casilla
+            rejilla.addWidget(ayuda, (i // 2) * 2 + 1, i % 2)
         self.extensiones = W.QLineEdit()
-        self.extensiones.setPlaceholderText(t('tipos_ext_ayuda'))
         self.extensiones.setAccessibleName(t('tipos_ext'))
         self.resultado = etiqueta('', 'gris')
         self.guardar = W.QPushButton(t('guardar'))

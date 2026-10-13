@@ -12,7 +12,7 @@ PREDETERMINADO = 'dracula'
 PALETAS = {
     'dracula': dict(fondo='#282a36', lateral='#21222c', tarjeta='#343746', campo='#21222c', hover='#424450',
                     seleccion='#44475a', texto='#f8f8f2', secundario='#b6bcd8', borde='#44475a',
-                    borde_control='#6272a4', apagado='#6272a4', acento='#bd93f9', sobre_acento='#282a36',
+                    borde_control='#7d8ab8', apagado='#6272a4', acento='#bd93f9', sobre_acento='#282a36',
                     verde='#50fa7b', sobre_verde='#282a36', rojo='#ff5555', naranja='#ffb86c',
                     cian='#8be9fd', rosa='#ff79c6', amarillo='#f1fa8c'),
     'alucard': dict(fondo='#fffbeb', lateral='#ece9df', tarjeta='#fffdf5', campo='#fffdf5', hover='#dedccf',

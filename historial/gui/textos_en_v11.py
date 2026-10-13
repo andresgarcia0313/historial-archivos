@@ -15,7 +15,7 @@ EN_V11 = {
     'cifra_copias': 'Used by copies', 'cifra_actual': 'Latest version', 'cifra_archivos': 'Files',
     'cifra_versiones': 'Saved versions', 'cifra_libre': 'Free on the drive', 'cifra_de': 'of {total}',
     'cifra_por_archivo': 'one per file', 'cifra_promedio': '{n} per file on average',
-    'uso_periodo': 'Copies from {primera} to {ultima}.',
+    'cifra_primera': 'First copy', 'cifra_ultima': 'Latest: {fecha}',
     'sec_por_tipo': 'By file type', 'sec_por_carpeta': 'By folder', 'sec_por_mes': 'Growth by month',
     'sec_detalle': 'Files that take the most space', 'tab_grandes': 'Largest', 'tab_versionados': 'Most versions',
     'col_tam': 'Total size', 'col_versiones': 'Versions', 'grafico_vacio': 'No data yet.',
