@@ -3,11 +3,13 @@ import os
 
 from .textos_en import EN as _EN
 from .textos_en_rest import EN_REST
+from .textos_en_v11 import EN_V11
 from .textos_es import ES as _ES
 from .textos_es_rest import ES_REST
+from .textos_es_v11 import ES_V11
 
-ES = {**_ES, **ES_REST}
-EN = {**_EN, **EN_REST}
+ES = {**_ES, **ES_REST, **ES_V11}
+EN = {**_EN, **EN_REST, **EN_V11}
 _forzado = None
 
 
