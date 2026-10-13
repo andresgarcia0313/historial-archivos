@@ -9,7 +9,9 @@ _ROLES = ((_R.Window, 'fondo'), (_R.WindowText, 'texto'), (_R.Base, 'campo'), (_
           (_R.Highlight, 'seleccion'), (_R.HighlightedText, 'texto'), (_R.ToolTipBase, 'tarjeta'),
           (_R.ToolTipText, 'texto'), (_R.PlaceholderText, 'secundario'), (_R.Link, 'cian'),
           (_R.LinkVisited, 'acento'), (_R.Light, 'hover'), (_R.Midlight, 'hover'), (_R.Mid, 'borde_control'),
-          (_R.Dark, 'lateral'), (_R.Shadow, 'lateral'), (_R.Accent, 'acento'))
+          (_R.Dark, 'lateral'), (_R.Shadow, 'lateral'))
+if hasattr(_R, 'Accent'):                      # Qt 6.6+; Ubuntu 24.04 trae 6.4
+    _ROLES += ((_R.Accent, 'acento'),)
 _APAGADOS = (_R.WindowText, _R.Text, _R.ButtonText)
 
 

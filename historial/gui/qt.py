@@ -6,10 +6,15 @@ try:
         raise ImportError('PyQt6 forzado')
     from PySide6 import QtCore as C, QtGui as G, QtWidgets as W
     from PySide6.QtCore import Qt, Signal, Slot
+    from shiboken6 import isValid as vivo
     NOMBRE = 'PySide6'
 except ImportError:
     from PyQt6 import QtCore as C, QtGui as G, QtWidgets as W
     from PyQt6.QtCore import Qt, pyqtSignal as Signal, pyqtSlot as Slot
+    from PyQt6 import sip
     NOMBRE = 'PyQt6'
 
-__all__ = ['C', 'G', 'W', 'Qt', 'Signal', 'Slot', 'NOMBRE']
+    def vivo(obj) -> bool:
+        return not sip.isdeleted(obj)
+
+__all__ = ['C', 'G', 'W', 'Qt', 'Signal', 'Slot', 'NOMBRE', 'vivo']
