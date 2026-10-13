@@ -81,6 +81,10 @@ and Next buttons.
 - Qt interface (PySide6, with PyQt6 as a fallback) with the same pages as the Windows Control
   Panel: Select drive, Exclude folders, Advanced settings, Restore personal files and
   Previous versions.
+- Dracula theme (default), Alucard light or follow the system, designed with Apple's Human Interface Guidelines.
+- Space usage by file type, folder and month, largest and most-versioned files, cleanup by type or folder.
+- File types: choose which categories to back up and which extensions to exclude; filter by type when restoring.
+- Other backups: detects Back In Time, Déjà Dup, Timeshift, Time Machine and File History folders on connected drives, and lets you change their schedule, folders and exclusions.
 - Dolphin and Nautilus context menu: "Previous versions" and "Restore personal files".
 
 ### Installation
